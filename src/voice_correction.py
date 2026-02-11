@@ -195,6 +195,16 @@ IMPLICIT_COMMANDS: dict[str, str] = {
     "archives": "ouvre 7zip",
     "stream": "ouvre obs",
     "dessin": "ouvre paint",
+    # Vague 10 - Onglets / Session / Ecrans
+    "onglet": "nouvel onglet",
+    "tab": "nouvel onglet",
+    "hibernation": "hiberne",
+    "heure": "quelle heure est-il",
+    "date": "quelle date",
+    "majuscules": "en majuscules",
+    "minuscules": "en minuscules",
+    "ecrans": "etends l'ecran",
+    "dupliquer": "duplique l'ecran",
 }
 
 

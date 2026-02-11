@@ -1062,6 +1062,72 @@ COMMANDS: list[JarvisCommand] = [
         "ouvre 7-zip", "gestionnaire d'archives",
     ], "app_open", "7zFM"),
 
+    # ── Vague 10: Onglets Chrome / Session / Ecrans / Saisie avancee ──
+    JarvisCommand("nouvel_onglet", "navigation", "Ouvrir un nouvel onglet Chrome", [
+        "nouvel onglet", "ouvre un onglet", "nouveau tab",
+        "new tab", "onglet vierge",
+    ], "hotkey", "ctrl+t"),
+    JarvisCommand("onglet_precedent", "navigation", "Onglet precedent Chrome", [
+        "onglet precedent", "tab precedent", "onglet d'avant",
+        "onglet a gauche",
+    ], "hotkey", "ctrl+shift+tab"),
+    JarvisCommand("onglet_suivant", "navigation", "Onglet suivant Chrome", [
+        "onglet suivant", "tab suivant", "prochain onglet",
+        "onglet a droite",
+    ], "hotkey", "ctrl+tab"),
+    JarvisCommand("rouvrir_onglet", "navigation", "Rouvrir le dernier onglet ferme", [
+        "rouvre l'onglet", "rouvrir onglet", "restaure l'onglet",
+        "onglet ferme", "ctrl shift t",
+    ], "hotkey", "ctrl+shift+t"),
+    JarvisCommand("deconnexion_windows", "systeme", "Deconnexion de la session Windows", [
+        "deconnecte moi", "deconnexion", "log out", "logout",
+        "ferme la session",
+    ], "powershell", "shutdown /l", confirm=True),
+    JarvisCommand("hibernation", "systeme", "Mettre en hibernation", [
+        "hiberne", "hibernation", "mise en hibernation",
+        "hibernate", "veille prolongee",
+    ], "powershell", "shutdown /h", confirm=True),
+    JarvisCommand("planifier_arret", "systeme", "Planifier un arret dans X minutes", [
+        "eteins dans {minutes} minutes", "arret dans {minutes} minutes",
+        "programme l'arret dans {minutes}", "shutdown dans {minutes}",
+    ], "powershell", "shutdown /s /t ([int]'{minutes}' * 60); \"Arret programme dans {minutes} min\"", ["minutes"]),
+    JarvisCommand("annuler_arret", "systeme", "Annuler un arret programme", [
+        "annule l'arret", "annuler shutdown", "cancel shutdown",
+        "arrete le compte a rebours", "annule l'extinction",
+    ], "powershell", "shutdown /a; 'Arret programme annule'"),
+    JarvisCommand("heure_actuelle", "systeme", "Donner l'heure actuelle", [
+        "quelle heure est-il", "quelle heure", "l'heure",
+        "donne moi l'heure", "heure actuelle",
+    ], "powershell", "Get-Date -Format 'dddd dd MMMM yyyy HH:mm:ss'"),
+    JarvisCommand("date_actuelle", "systeme", "Donner la date actuelle", [
+        "quelle date", "quel jour on est", "on est quel jour",
+        "la date", "date actuelle", "aujourd'hui",
+    ], "powershell", "Get-Date -Format 'dddd dd MMMM yyyy'"),
+    JarvisCommand("ecran_externe_etendre", "systeme", "Etendre sur ecran externe", [
+        "etends l'ecran", "ecran etendu", "mode etendu",
+        "extend display", "deux ecrans",
+    ], "powershell", "displayswitch.exe /extend"),
+    JarvisCommand("ecran_duplique", "systeme", "Dupliquer l'ecran", [
+        "duplique l'ecran", "ecran duplique", "mode duplique",
+        "clone l'ecran", "meme image deux ecrans",
+    ], "powershell", "displayswitch.exe /clone"),
+    JarvisCommand("ecran_interne_seul", "systeme", "Ecran interne uniquement", [
+        "ecran principal seulement", "ecran interne seul",
+        "desactive l'ecran externe", "un seul ecran",
+    ], "powershell", "displayswitch.exe /internal"),
+    JarvisCommand("ecran_externe_seul", "systeme", "Ecran externe uniquement", [
+        "ecran externe seulement", "ecran externe seul",
+        "desactive l'ecran principal", "second ecran seul",
+    ], "powershell", "displayswitch.exe /external"),
+    JarvisCommand("texte_majuscule", "saisie", "Convertir le presse-papier en majuscules", [
+        "en majuscules", "tout en majuscules", "texte en majuscules",
+        "uppercase", "caps",
+    ], "powershell", "$t = Get-Clipboard; Set-Clipboard ($t.ToUpper()); 'Texte converti en majuscules'"),
+    JarvisCommand("texte_minuscule", "saisie", "Convertir le presse-papier en minuscules", [
+        "en minuscules", "tout en minuscules", "texte en minuscules",
+        "lowercase",
+    ], "powershell", "$t = Get-Clipboard; Set-Clipboard ($t.ToLower()); 'Texte converti en minuscules'"),
+
     # ══════════════════════════════════════════════════════════════════════
     # TRADING & IA (10 commandes)
     # ══════════════════════════════════════════════════════════════════════
@@ -1605,6 +1671,23 @@ VOICE_CORRECTIONS: dict[str, str] = {
     "planiffie": "planifie",
     "variablle": "variable",
     "pathe": "path",
+    # Vague 10 — Onglets / Session / Ecrans / Texte
+    "onglay": "onglet",
+    "onglet": "onglet",
+    "tabbe": "tab",
+    "tabe": "tab",
+    "hibernassion": "hibernation",
+    "ibernation": "hibernation",
+    "deconnexcion": "deconnexion",
+    "deconexion": "deconnexion",
+    "majuscul": "majuscules",
+    "minuscul": "minuscules",
+    "uppercas": "uppercase",
+    "lowercas": "lowercase",
+    "shutdowne": "shutdown",
+    "sheutdaoune": "shutdown",
+    "ecran externe": "ecran externe",
+    "displai": "display",
 }
 
 

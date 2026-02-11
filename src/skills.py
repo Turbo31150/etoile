@@ -1191,4 +1191,50 @@ def _default_skills() -> list[Skill]:
             ],
             category="systeme",
         ),
+
+        # ── VAGUE 10: Pipelines session / ecrans / productivite ──
+
+        Skill(
+            name="mode_presentation",
+            description="Mode presentation: ecran etendu + volume off + focus assist + luminosite max",
+            triggers=[
+                "mode presentation", "je vais presenter", "lance la presentation",
+                "prepare la presentation", "powerpoint mode",
+            ],
+            steps=[
+                SkillStep("powershell_run", {"command": "displayswitch.exe /extend"}, "Ecran etendu"),
+                SkillStep("powershell_run", {"command": "$b = 100; (Get-CimInstance -Namespace root/WMI -ClassName WmiMonitorBrightnessMethods).WmiSetBrightness(1, $b)"}, "Luminosite max"),
+                SkillStep("press_hotkey", {"keys": "volume_mute"}, "Couper le son"),
+                SkillStep("notify", {"title": "JARVIS", "message": "Mode presentation actif."}, "Notification"),
+            ],
+            category="productivite",
+        ),
+        Skill(
+            name="fin_journee",
+            description="Fin de journee: sauvegarde + ferme tout + planifie veille",
+            triggers=[
+                "fin de journee", "j'ai fini", "bonne nuit jarvis",
+                "c'est fini pour aujourd'hui", "je m'en vais",
+            ],
+            steps=[
+                SkillStep("press_hotkey", {"keys": "ctrl+s"}, "Sauvegarder"),
+                SkillStep("powershell_run", {"command": "Get-Date -Format 'dddd dd MMMM yyyy HH:mm' | Out-String"}, "Heure de fin"),
+                SkillStep("notify", {"title": "JARVIS", "message": "Bonne soiree ! Tout est sauvegarde."}, "Notification"),
+            ],
+            category="routine",
+        ),
+        Skill(
+            name="mode_dual_screen",
+            description="Mode double ecran: etendre + snap fenetre + luminosite uniforme",
+            triggers=[
+                "mode double ecran", "active les deux ecrans", "mode dual screen",
+                "deux ecrans", "branche l'ecran",
+            ],
+            steps=[
+                SkillStep("powershell_run", {"command": "displayswitch.exe /extend"}, "Ecran etendu"),
+                SkillStep("powershell_run", {"command": "$b = 70; (Get-CimInstance -Namespace root/WMI -ClassName WmiMonitorBrightnessMethods).WmiSetBrightness(1, $b)"}, "Luminosite 70%"),
+                SkillStep("notify", {"title": "JARVIS", "message": "Mode double ecran actif."}, "Notification"),
+            ],
+            category="productivite",
+        ),
     ]
