@@ -15,26 +15,34 @@ from src.config import config
 VOICE_DRIVER_PATH = Path("F:/BUREAU/TRADING_V2_PRODUCTION/voice_system/voice_driver.py")
 
 
-async def listen_voice(timeout: float = 10.0) -> str | None:
+async def listen_voice(timeout: float = 10.0, keyboard_fallback: bool = False) -> str | None:
     """Capture voice input via Whisper STT (voice_driver.py).
 
     Returns transcribed text or None on timeout/error.
+    If keyboard_fallback=True, falls back to keyboard input when voice fails.
     """
-    if not VOICE_DRIVER_PATH.exists():
-        return None
+    if VOICE_DRIVER_PATH.exists():
+        try:
+            result = await asyncio.to_thread(
+                lambda: subprocess.run(
+                    [sys.executable, str(VOICE_DRIVER_PATH), "--listen", "--timeout", str(timeout)],
+                    capture_output=True, text=True, timeout=timeout + 5,
+                    cwd=str(VOICE_DRIVER_PATH.parent),
+                )
+            )
+            if result.returncode == 0 and result.stdout.strip():
+                return result.stdout.strip()
+        except (subprocess.TimeoutExpired, Exception):
+            pass
 
-    try:
-        result = subprocess.run(
-            [sys.executable, str(VOICE_DRIVER_PATH), "--listen", "--timeout", str(timeout)],
-            capture_output=True,
-            text=True,
-            timeout=timeout + 5,
-            cwd=str(VOICE_DRIVER_PATH.parent),
-        )
-        if result.returncode == 0 and result.stdout.strip():
-            return result.stdout.strip()
-    except (subprocess.TimeoutExpired, Exception):
-        pass
+    if keyboard_fallback:
+        try:
+            text = await asyncio.to_thread(input, "[JARVIS] > ")
+            if text and text.strip():
+                return text.strip()
+        except (EOFError, KeyboardInterrupt):
+            return None
+
     return None
 
 

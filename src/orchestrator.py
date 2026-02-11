@@ -468,4 +468,176 @@ async def run_voice(cwd: str | None = None) -> None:
             if fr:
                 await speak_text(fr[:500])
 
-    print("\n[JARVIS] Session vocale terminee.")
+    _safe_print("\n[JARVIS] Session vocale terminee.")
+
+
+async def run_hybrid(cwd: str | None = None) -> None:
+    """Hybrid mode: keyboard input with full voice pipeline (correction, skills, brain).
+
+    Same as run_voice but uses keyboard input instead of microphone.
+    Perfect for testing without audio hardware.
+    """
+    from src.commands import correct_voice_text, match_command, format_commands_help
+    from src.executor import execute_command
+    from src.voice_correction import full_correction_pipeline, VoiceSession, format_suggestions
+    from src.skills import find_skill, load_skills, format_skills_list, suggest_next_actions, log_action
+
+    options = build_options(cwd)
+    session = VoiceSession()
+    pending_confirm: tuple | None = None
+
+    skills = load_skills()
+    from src.commands import COMMANDS
+    n_cmds = len(COMMANDS)
+    _safe_print(f"=== JARVIS v{JARVIS_VERSION} | MODE HYBRIDE (clavier) ===")
+    _safe_print(f"69 outils MCP | {len(skills)} skills | {n_cmds} commandes")
+    _safe_print("Tape tes commandes comme si tu parlais. 'exit' pour quitter.\n")
+
+    async with ClaudeSDKClient(options=options) as client:
+        while True:
+            try:
+                raw_text = input("\n[JARVIS] > ")
+            except (EOFError, KeyboardInterrupt):
+                break
+
+            if not raw_text or not raw_text.strip():
+                continue
+
+            raw_text = raw_text.strip()
+            session.last_raw = raw_text
+
+            # Handle pending confirmation
+            if pending_confirm is not None:
+                cmd, params = pending_confirm
+                pending_confirm = None
+                if session.is_confirmation(raw_text):
+                    result = await execute_command(cmd, params)
+                    _safe_print(f"[EXEC] {result}")
+                    continue
+                elif session.is_denial(raw_text):
+                    _safe_print("Commande annulee.")
+                    continue
+
+            # Full correction pipeline
+            cr = await full_correction_pipeline(raw_text)
+            _safe_print(f"[PIPELINE] method={cr['method']} confidence={cr['confidence']:.2f}")
+            if cr["corrected"] != raw_text.lower().strip():
+                _safe_print(f"[CORRECTED] {cr['corrected']}")
+            if cr["intent"] and cr["intent"] != cr["corrected"]:
+                _safe_print(f"[INTENT] {cr['intent']}")
+
+            cmd = cr["command"]
+            params = cr["params"]
+            confidence = cr["confidence"]
+
+            # Exit
+            if cmd and cmd.name == "jarvis_stop":
+                _safe_print("Session terminee. A bientot.")
+                break
+
+            # Help
+            if cmd and cmd.name == "jarvis_aide":
+                _safe_print(format_commands_help())
+                _safe_print("\n" + format_skills_list())
+                continue
+
+            # Check for skill match
+            intent_text = cr["intent"] or cr["corrected"] or raw_text
+            skill, skill_score = find_skill(intent_text)
+            if skill and skill_score >= 0.65:
+                _safe_print(f"[SKILL] {skill.name} (score={skill_score:.2f}, {len(skill.steps)} etapes)")
+                session.add_to_history(intent_text)
+
+                if hasattr(skill, 'confirm') and skill.confirm:
+                    pending_confirm = (skill, {})
+                    _safe_print(f"Confirme le skill {skill.name}: {skill.description}? (oui/non)")
+                    continue
+
+                _safe_print(f"Lancement du skill {skill.name}...")
+                skill_prompt = (
+                    f"Execute le skill '{skill.name}': {skill.description}. "
+                    f"Etapes: " + "; ".join(
+                        f"{i+1}) {s.tool}({s.args})" if s.args else f"{i+1}) {s.tool}"
+                        for i, s in enumerate(skill.steps)
+                    ) + ". Execute chaque etape avec les outils MCP et resume les resultats."
+                )
+                await client.query(skill_prompt)
+                rp = []
+                async for msg in client.receive_response():
+                    if isinstance(msg, AssistantMessage):
+                        for b in msg.content:
+                            if isinstance(b, TextBlock):
+                                rp.append(b.text)
+                                _safe_print(b.text, end="", flush=True)
+                            elif isinstance(b, ToolUseBlock):
+                                _safe_print(f"\n  [TOOL] {b.name}", flush=True)
+                    if isinstance(msg, ResultMessage):
+                        if msg.total_cost_usd:
+                            _safe_print(f"\n  [$] {msg.total_cost_usd:.4f} USD", flush=True)
+                fr = "".join(rp).strip()
+                if fr:
+                    log_action(f"skill:{skill.name}", fr[:200], True)
+                suggestions = suggest_next_actions(intent_text)
+                if suggestions:
+                    _safe_print(f"\n[SUGGESTIONS] {', '.join(s.split(' — ')[0] for s in suggestions)}")
+                continue
+
+            # High confidence match
+            if cmd and confidence >= 0.65:
+                session.add_to_history(cr["intent"])
+
+                if cmd.confirm:
+                    pending_confirm = (cmd, params)
+                    _safe_print(f"Confirme: {cmd.description}? (oui/non)")
+                    continue
+
+                result = await execute_command(cmd, params)
+
+                if result == "__EXIT__":
+                    _safe_print("Session terminee.")
+                    break
+                elif result.startswith("__TOOL__"):
+                    tool_action = result[len("__TOOL__"):]
+                    prompt = f"Utilise l'outil mcp__jarvis__{tool_action} et rapporte le resultat en francais."
+                    await client.query(prompt)
+                    rp = []
+                    async for msg in client.receive_response():
+                        if isinstance(msg, AssistantMessage):
+                            for b in msg.content:
+                                if isinstance(b, TextBlock):
+                                    rp.append(b.text)
+                                    _safe_print(b.text, end="", flush=True)
+                    fr = "".join(rp).strip()
+                elif not result.startswith("__"):
+                    _safe_print(f"[EXEC] {result}")
+                continue
+
+            # Low confidence with suggestions
+            if cr["suggestions"] and confidence < 0.65:
+                session.last_suggestions = cr["suggestions"]
+                sug_text = format_suggestions(cr["suggestions"])
+                _safe_print(sug_text)
+                top = cr["suggestions"][0][0]
+                _safe_print(f"Tu voulais dire: {top.triggers[0]}? (oui/non)")
+                pending_confirm = (top, {})
+                continue
+
+            # No match → freeform to Claude
+            freeform = cr["intent"] or cr["corrected"] or raw_text
+            _safe_print(f"[FREEFORM] -> Claude: {freeform}")
+            session.add_to_history(freeform)
+            await client.query(freeform)
+            rp = []
+            async for msg in client.receive_response():
+                if isinstance(msg, AssistantMessage):
+                    for b in msg.content:
+                        if isinstance(b, TextBlock):
+                            rp.append(b.text)
+                            _safe_print(b.text, end="", flush=True)
+                        elif isinstance(b, ToolUseBlock):
+                            _safe_print(f"\n  [TOOL] {b.name}", flush=True)
+                if isinstance(msg, ResultMessage):
+                    if msg.total_cost_usd:
+                        _safe_print(f"\n  [$] {msg.total_cost_usd:.4f} USD", flush=True)
+
+    _safe_print("\n[JARVIS] Session hybride terminee.")
