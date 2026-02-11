@@ -356,6 +356,124 @@ COMMANDS: list[JarvisCommand] = [
         "active le mode nuit", "desactive le mode nuit", "night mode",
     ], "hotkey", "win+a"),
 
+    # ── Raccourcis Windows supplementaires ──
+    JarvisCommand("ouvrir_run", "systeme", "Ouvrir la boite Executer", [
+        "ouvre executer", "boite de dialogue executer", "run",
+        "ouvre run", "ouvrir executer",
+    ], "hotkey", "win+r"),
+    JarvisCommand("recherche_windows", "systeme", "Recherche Windows", [
+        "recherche windows", "cherche sur le pc", "recherche sur le pc",
+        "recherche dans windows", "search windows",
+    ], "hotkey", "win+s"),
+    JarvisCommand("centre_notifications", "systeme", "Ouvrir le centre de notifications", [
+        "ouvre les notifications", "notifications", "centre de notifications",
+        "ouvre le centre de notifications",
+    ], "hotkey", "win+n"),
+    JarvisCommand("ouvrir_widgets", "systeme", "Ouvrir les widgets", [
+        "ouvre les widgets", "widgets", "affiche les widgets",
+        "ouvre le panneau widgets",
+    ], "hotkey", "win+w"),
+    JarvisCommand("ouvrir_emojis", "systeme", "Ouvrir le panneau emojis", [
+        "ouvre les emojis", "emojis", "panneau emojis",
+        "selecteur emojis",
+    ], "hotkey", "win+;"),
+    JarvisCommand("projeter_ecran", "systeme", "Projeter l'ecran", [
+        "projette l'ecran", "duplique l'ecran", "mode ecran",
+        "projeter", "projection ecran",
+    ], "hotkey", "win+p"),
+
+    # ── Bureaux virtuels Windows 11 ──
+    JarvisCommand("vue_taches", "systeme", "Vue des taches / bureaux virtuels", [
+        "vue des taches", "bureaux virtuels", "task view",
+        "ouvre la vue des taches", "ouvre les bureaux virtuels",
+    ], "hotkey", "win+tab"),
+    JarvisCommand("bureau_suivant", "systeme", "Passer au bureau virtuel suivant", [
+        "bureau suivant", "prochain bureau", "next desktop",
+        "bureau virtuel suivant",
+    ], "hotkey", "ctrl+win+right"),
+    JarvisCommand("bureau_precedent", "systeme", "Passer au bureau virtuel precedent", [
+        "bureau precedent", "bureau virtuel precedent",
+        "previous desktop", "bureau d'avant",
+    ], "hotkey", "ctrl+win+left"),
+
+    # ── Parametres Windows (ms-settings:) ──
+    JarvisCommand("ouvrir_parametres", "systeme", "Ouvrir les parametres Windows", [
+        "ouvre les parametres", "parametres", "reglages",
+        "ouvre les reglages", "ouvrir parametres", "settings",
+    ], "ms_settings", "ms-settings:"),
+    JarvisCommand("param_wifi", "systeme", "Parametres Wi-Fi", [
+        "parametres wifi", "reglages wifi", "ouvre les parametres wifi",
+        "config wifi",
+    ], "ms_settings", "ms-settings:network-wifi"),
+    JarvisCommand("param_bluetooth", "systeme", "Parametres Bluetooth", [
+        "parametres bluetooth", "reglages bluetooth",
+        "ouvre les parametres bluetooth", "config bluetooth",
+    ], "ms_settings", "ms-settings:bluetooth"),
+    JarvisCommand("param_affichage", "systeme", "Parametres d'affichage", [
+        "parametres affichage", "reglages ecran", "parametres ecran",
+        "config affichage",
+    ], "ms_settings", "ms-settings:display"),
+    JarvisCommand("param_son", "systeme", "Parametres son", [
+        "parametres son", "reglages audio", "parametres audio",
+        "config son",
+    ], "ms_settings", "ms-settings:sound"),
+    JarvisCommand("param_stockage", "systeme", "Espace disque et stockage", [
+        "espace disque", "stockage", "parametres stockage",
+        "reglages stockage", "combien d'espace",
+    ], "ms_settings", "ms-settings:storagesense"),
+    JarvisCommand("param_mises_a_jour", "systeme", "Mises a jour Windows", [
+        "mises a jour", "windows update", "mise a jour",
+        "verifie les mises a jour", "updates",
+    ], "ms_settings", "ms-settings:windowsupdate"),
+    JarvisCommand("param_alimentation", "systeme", "Parametres d'alimentation", [
+        "parametres alimentation", "economie energie",
+        "reglages alimentation", "gestion energie",
+    ], "ms_settings", "ms-settings:powersleep"),
+
+    # ── Bluetooth on/off ──
+    JarvisCommand("bluetooth_on", "systeme", "Activer le Bluetooth", [
+        "active le bluetooth", "allume bluetooth", "bluetooth on",
+        "active bluetooth", "allume le bluetooth",
+    ], "powershell", "Add-Type -AssemblyName System.Runtime.WindowsRuntime; $radio = [Windows.Devices.Radios.Radio,Windows.System.Devices,ContentType=WindowsRuntime]::GetRadiosAsync().GetAwaiter().GetResult() | Where-Object { $_.Kind -eq 'Bluetooth' }; if($radio) { $radio[0].SetStateAsync('On').GetAwaiter().GetResult() | Out-Null; 'Bluetooth active' } else { 'Aucun adaptateur Bluetooth' }"),
+    JarvisCommand("bluetooth_off", "systeme", "Desactiver le Bluetooth", [
+        "desactive le bluetooth", "coupe bluetooth", "bluetooth off",
+        "desactive bluetooth", "coupe le bluetooth",
+    ], "powershell", "Add-Type -AssemblyName System.Runtime.WindowsRuntime; $radio = [Windows.Devices.Radios.Radio,Windows.System.Devices,ContentType=WindowsRuntime]::GetRadiosAsync().GetAwaiter().GetResult() | Where-Object { $_.Kind -eq 'Bluetooth' }; if($radio) { $radio[0].SetStateAsync('Off').GetAwaiter().GetResult() | Out-Null; 'Bluetooth desactive' } else { 'Aucun adaptateur Bluetooth' }"),
+
+    # ── Luminosite ──
+    JarvisCommand("luminosite_haut", "systeme", "Augmenter la luminosite", [
+        "augmente la luminosite", "plus lumineux", "luminosite plus",
+        "monte la luminosite",
+    ], "powershell", "$b = (Get-CimInstance -Namespace root/WMI -ClassName WmiMonitorBrightness).CurrentBrightness; $n = [Math]::Min(100, $b + 10); (Get-CimInstance -Namespace root/WMI -ClassName WmiMonitorBrightnessMethods).WmiSetBrightness(1, $n); \"Luminosite: $n%\""),
+    JarvisCommand("luminosite_bas", "systeme", "Baisser la luminosite", [
+        "baisse la luminosite", "moins lumineux", "luminosite moins",
+        "diminue la luminosite",
+    ], "powershell", "$b = (Get-CimInstance -Namespace root/WMI -ClassName WmiMonitorBrightness).CurrentBrightness; $n = [Math]::Max(0, $b - 10); (Get-CimInstance -Namespace root/WMI -ClassName WmiMonitorBrightnessMethods).WmiSetBrightness(1, $n); \"Luminosite: $n%\""),
+
+    # ── Services Windows via MCP ──
+    JarvisCommand("lister_services", "systeme", "Lister les services Windows", [
+        "liste les services", "services windows", "quels services",
+        "montre les services",
+    ], "jarvis_tool", "list_services"),
+    JarvisCommand("demarrer_service", "systeme", "Demarrer un service Windows", [
+        "demarre le service {nom}", "start service {nom}",
+        "lance le service {nom}",
+    ], "jarvis_tool", "start_service:{nom}", ["nom"]),
+    JarvisCommand("arreter_service", "systeme", "Arreter un service Windows", [
+        "arrete le service {nom}", "stop service {nom}",
+        "stoppe le service {nom}",
+    ], "jarvis_tool", "stop_service:{nom}", ["nom"], confirm=True),
+
+    # ── Infos systeme supplementaires ──
+    JarvisCommand("resolution_ecran", "systeme", "Resolution de l'ecran", [
+        "resolution ecran", "quelle resolution", "resolution de l'ecran",
+        "taille ecran",
+    ], "jarvis_tool", "screen_resolution"),
+    JarvisCommand("taches_planifiees", "systeme", "Taches planifiees Windows", [
+        "taches planifiees", "taches automatiques", "scheduled tasks",
+        "taches programmees",
+    ], "jarvis_tool", "scheduled_tasks"),
+
     # ══════════════════════════════════════════════════════════════════════
     # TRADING & IA (10 commandes)
     # ══════════════════════════════════════════════════════════════════════
@@ -399,6 +517,22 @@ COMMANDS: list[JarvisCommand] = [
         "demande a {node} {prompt}", "interroge {node} sur {prompt}",
         "pose a {node} la question {prompt}",
     ], "jarvis_tool", "lm_query:{node}:{prompt}", ["node", "prompt"]),
+    JarvisCommand("signaux_trading", "trading", "Signaux de trading en attente", [
+        "signaux en attente", "quels signaux", "signaux trading",
+        "liste les signaux", "signaux",
+    ], "jarvis_tool", "trading_pending_signals"),
+    JarvisCommand("positions_trading", "trading", "Positions de trading ouvertes", [
+        "mes positions", "positions ouvertes", "quelles positions",
+        "positions trading", "positions",
+    ], "jarvis_tool", "trading_positions"),
+    JarvisCommand("statut_trading", "trading", "Statut global du trading", [
+        "statut trading", "etat du trading", "status trading",
+        "comment va le trading", "trading status",
+    ], "jarvis_tool", "trading_status"),
+    JarvisCommand("executer_signal", "trading", "Executer un signal de trading", [
+        "execute le signal {id}", "lance le signal {id}",
+        "trade le signal {id}", "execute signal {id}",
+    ], "jarvis_tool", "trading_execute_signal:{id}", ["id"], confirm=True),
 
     # ══════════════════════════════════════════════════════════════════════
     # CONTROLE JARVIS (6 commandes)
@@ -667,6 +801,45 @@ VOICE_CORRECTIONS: dict[str, str] = {
     "clustere": "cluster",
     "téléchargement": "telechargements",
     "telechargement": "telechargements",
+    # Parametres / Settings
+    "paramaitre": "parametres",
+    "parametre": "parametres",
+    "paramaître": "parametres",
+    "reglage": "reglages",
+    "raglage": "reglages",
+    # Bluetooth
+    "bleutous": "bluetooth",
+    "bleutouss": "bluetooth",
+    "bluethooth": "bluetooth",
+    "bloutousse": "bluetooth",
+    "blue tooth": "bluetooth",
+    # Emojis / Widgets
+    "emogi": "emojis",
+    "emojie": "emojis",
+    "widjet": "widgets",
+    "vidjette": "widgets",
+    # Luminosite
+    "lumineausite": "luminosite",
+    "luminausite": "luminosite",
+    # Notifications
+    "notificassion": "notifications",
+    "notificasion": "notifications",
+    # Services
+    "servicee": "service",
+    "servisse": "service",
+    # Stockage / Resolution
+    "stoquage": "stockage",
+    "resolussion": "resolution",
+    "rezolution": "resolution",
+    # Explorateur
+    "explorrateur": "explorateur",
+    "eksplorateur": "explorateur",
+    # Presse-papier
+    "presse papier": "presse-papier",
+    "pressepapier": "presse-papier",
+    # Bureau virtuel
+    "burot": "bureau",
+    "buro": "bureau",
 }
 
 
@@ -681,9 +854,9 @@ def correct_voice_text(text: str) -> str:
         corrected.append(VOICE_CORRECTIONS.get(word, word))
     text = " ".join(corrected)
 
-    # Apply phrase-level corrections
+    # Apply phrase-level corrections (multi-word only to avoid substring issues)
     for wrong, right in VOICE_CORRECTIONS.items():
-        if wrong in text:
+        if " " in wrong and wrong in text:
             text = text.replace(wrong, right)
 
     return text
@@ -776,8 +949,11 @@ def format_commands_help() -> str:
         "navigation": "Navigation Web",
         "fichiers": "Fichiers & Documents",
         "app": "Applications",
+        "media": "Controle Media",
+        "fenetre": "Fenetres Windows",
+        "clipboard": "Presse-papier & Saisie",
         "systeme": "Systeme Windows",
-        "trading": "Trading",
+        "trading": "Trading & IA",
         "jarvis": "Controle JARVIS",
     }
     for cat, cmds in categories.items():
