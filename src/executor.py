@@ -280,6 +280,28 @@ HOTKEY_MAP: dict[str, str] = {
     # Bureaux virtuels
     "ctrl+win+right": _ctrl_win_arrow_ps("RIGHT"),
     "ctrl+win+left": _ctrl_win_arrow_ps("LEFT"),
+    # Bureaux virtuels avances
+    "ctrl+win+d": (
+        "Add-Type -TypeDefinition 'using System;using System.Runtime.InteropServices;"
+        "public class K{[DllImport(\"user32.dll\")]public static extern void keybd_event(byte k,byte s,int f,int e);}'; "
+        "[K]::keybd_event(0x11,0,0,0); [K]::keybd_event(0x5B,0,0,0); [K]::keybd_event(0x44,0,0,0); "
+        "[K]::keybd_event(0x44,0,2,0); [K]::keybd_event(0x5B,0,2,0); [K]::keybd_event(0x11,0,2,0)"
+    ),
+    "ctrl+win+F4": (
+        "Add-Type -TypeDefinition 'using System;using System.Runtime.InteropServices;"
+        "public class K{[DllImport(\"user32.dll\")]public static extern void keybd_event(byte k,byte s,int f,int e);}'; "
+        "[K]::keybd_event(0x11,0,0,0); [K]::keybd_event(0x5B,0,0,0); [K]::keybd_event(0x73,0,0,0); "
+        "[K]::keybd_event(0x73,0,2,0); [K]::keybd_event(0x5B,0,2,0); [K]::keybd_event(0x11,0,2,0)"
+    ),
+    # Navigation/Edition
+    "ctrl++": "(New-Object -ComObject WScript.Shell).SendKeys('^{+}')",
+    "ctrl+-": "(New-Object -ComObject WScript.Shell).SendKeys('^{-}')",
+    "ctrl+0": "(New-Object -ComObject WScript.Shell).SendKeys('^0')",
+    "ctrl+p": "(New-Object -ComObject WScript.Shell).SendKeys('^p')",
+    "F2": "(New-Object -ComObject WScript.Shell).SendKeys('{F2}')",
+    "F5": "(New-Object -ComObject WScript.Shell).SendKeys('{F5}')",
+    "delete": "(New-Object -ComObject WScript.Shell).SendKeys('{DELETE}')",
+    "alt+enter": "(New-Object -ComObject WScript.Shell).SendKeys('%{ENTER}')",
 }
 
 

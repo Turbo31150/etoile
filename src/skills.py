@@ -545,4 +545,192 @@ def _default_skills() -> list[Skill]:
             ],
             category="trading",
         ),
+
+        # ── VAGUE 2: Pipelines avances ──
+
+        Skill(
+            name="mode_reunion",
+            description="Mode reunion: ouvre Teams/Zoom, coupe micro, check camera, volume bas",
+            triggers=[
+                "mode reunion", "lance la reunion", "session visio",
+                "mode visio", "visioconference", "mode meeting",
+            ],
+            steps=[
+                SkillStep("app_open", {"name": "teams"}, "Ouvrir Teams"),
+                SkillStep("volume_down", {}, "Baisser le volume"),
+                SkillStep("volume_down", {}, "Baisser encore"),
+                SkillStep("notify", {"title": "JARVIS", "message": "Mode reunion actif. Micro coupe par defaut."}, "Notification"),
+            ],
+            category="communication",
+        ),
+        Skill(
+            name="mode_communication",
+            description="Mode communication: ouvre Discord, Telegram, Gmail",
+            triggers=[
+                "mode communication", "ouvre les messageries", "mode social",
+                "lance les messageries", "session communication",
+            ],
+            steps=[
+                SkillStep("app_open", {"name": "discord"}, "Ouvrir Discord"),
+                SkillStep("app_open", {"name": "telegram"}, "Ouvrir Telegram"),
+                SkillStep("open_url", {"url": "https://mail.google.com"}, "Ouvrir Gmail"),
+                SkillStep("notify", {"title": "JARVIS", "message": "Messageries ouvertes."}, "Notification"),
+            ],
+            category="communication",
+        ),
+        Skill(
+            name="pause_cafe",
+            description="Pause cafe: sauvegarde, verrouille le PC, coupe le son",
+            triggers=[
+                "pause cafe", "je fais une pause", "pause",
+                "je reviens", "brb", "afk",
+            ],
+            steps=[
+                SkillStep("press_hotkey", {"keys": "ctrl+s"}, "Sauvegarder"),
+                SkillStep("volume_mute", {}, "Couper le son"),
+                SkillStep("lock_screen", {}, "Verrouiller le PC"),
+            ],
+            category="routine",
+        ),
+        Skill(
+            name="retour_pause",
+            description="Retour de pause: reactive le son, check notifications, status rapide",
+            triggers=[
+                "retour de pause", "je suis revenu", "c'est bon je suis la",
+                "retour", "de retour", "je suis de retour",
+            ],
+            steps=[
+                SkillStep("volume_up", {}, "Remettre le son"),
+                SkillStep("volume_up", {}, "Volume normal"),
+                SkillStep("system_info", {}, "Check systeme rapide"),
+                SkillStep("notify", {"title": "JARVIS", "message": "Bon retour. Tout est operationnel."}, "Notification"),
+            ],
+            category="routine",
+        ),
+        Skill(
+            name="mode_ia",
+            description="Mode IA: lance LM Studio, check cluster, liste modeles",
+            triggers=[
+                "mode ia", "mode intelligence artificielle", "session ia",
+                "lance l'ia", "active l'ia", "mode cluster",
+            ],
+            steps=[
+                SkillStep("app_open", {"name": "lmstudio"}, "Lancer LM Studio"),
+                SkillStep("lm_cluster_status", {}, "Verifier le cluster"),
+                SkillStep("lm_models", {}, "Lister les modeles charges"),
+                SkillStep("notify", {"title": "JARVIS", "message": "Mode IA actif. Cluster verifie."}, "Notification"),
+            ],
+            category="dev",
+        ),
+        Skill(
+            name="deploiement",
+            description="Mode deploiement: terminal, status systeme, check services, monitoring",
+            triggers=[
+                "mode deploiement", "lance le deploiement", "session deploy",
+                "deploy", "deploie", "mode deploy",
+            ],
+            steps=[
+                SkillStep("app_open", {"name": "wt"}, "Ouvrir Terminal"),
+                SkillStep("system_info", {}, "Check systeme"),
+                SkillStep("list_services", {}, "Verifier les services"),
+                SkillStep("network_info", {}, "Check reseau"),
+                SkillStep("notify", {"title": "JARVIS", "message": "Mode deploiement pret."}, "Notification"),
+            ],
+            category="dev",
+        ),
+        Skill(
+            name="debug_reseau",
+            description="Debug reseau: info reseau, scan wifi, ping, services, IP",
+            triggers=[
+                "debug reseau", "probleme reseau", "diagnostique reseau",
+                "le reseau marche pas", "pas d'internet", "debug network",
+            ],
+            steps=[
+                SkillStep("network_info", {}, "Infos reseau"),
+                SkillStep("wifi_networks", {}, "Scanner Wi-Fi"),
+                SkillStep("ping", {"host": "8.8.8.8"}, "Ping Google DNS"),
+                SkillStep("ping", {"host": "192.168.1.1"}, "Ping gateway"),
+                SkillStep("notify", {"title": "JARVIS", "message": "Diagnostic reseau termine."}, "Notification"),
+            ],
+            category="systeme",
+        ),
+        Skill(
+            name="mode_lecture",
+            description="Mode lecture: ferme distractions, mode nuit, volume bas, zoom texte",
+            triggers=[
+                "mode lecture", "mode etude", "session lecture",
+                "je lis", "mode read", "mode lire",
+            ],
+            steps=[
+                SkillStep("close_app", {"name": "discord"}, "Fermer Discord"),
+                SkillStep("close_app", {"name": "spotify"}, "Fermer Spotify"),
+                SkillStep("press_hotkey", {"keys": "win+a"}, "Mode nuit"),
+                SkillStep("volume_down", {}, "Baisser le volume"),
+                SkillStep("volume_down", {}, "Volume minimal"),
+                SkillStep("notify", {"title": "JARVIS", "message": "Mode lecture actif."}, "Notification"),
+            ],
+            category="productivite",
+        ),
+        Skill(
+            name="update_systeme",
+            description="Preparation mise a jour: sauvegarde, check updates, check espace disque",
+            triggers=[
+                "update systeme", "mise a jour systeme", "prepare les updates",
+                "mets a jour le pc", "lance les mises a jour",
+            ],
+            steps=[
+                SkillStep("press_hotkey", {"keys": "ctrl+s"}, "Sauvegarder le travail"),
+                SkillStep("system_info", {}, "Check systeme"),
+                SkillStep("powershell_run", {"command": "Get-CimInstance Win32_LogicalDisk | Select DeviceID, @{N='Free(GB)';E={[math]::Round($_.FreeSpace/1GB,1)}} | Out-String"}, "Espace disque"),
+                SkillStep("notify", {"title": "JARVIS", "message": "Systeme pret pour mise a jour."}, "Notification"),
+            ],
+            category="systeme",
+        ),
+        Skill(
+            name="mode_recherche",
+            description="Mode recherche: ouvre Chrome, Google, multiple onglets, presse-papier",
+            triggers=[
+                "mode recherche", "session recherche", "lance les recherches",
+                "mode investigation", "je recherche",
+            ],
+            steps=[
+                SkillStep("app_open", {"name": "chrome"}, "Ouvrir Chrome"),
+                SkillStep("open_url", {"url": "https://www.google.com"}, "Google"),
+                SkillStep("open_url", {"url": "https://www.perplexity.ai"}, "Perplexity"),
+                SkillStep("notify", {"title": "JARVIS", "message": "Mode recherche actif. Chrome + Perplexity."}, "Notification"),
+            ],
+            category="productivite",
+        ),
+        Skill(
+            name="workspace_turbo",
+            description="Workspace JARVIS Turbo: ouvre le projet, terminal, cluster check",
+            triggers=[
+                "workspace turbo", "ouvre turbo", "session turbo",
+                "lance turbo", "mode turbo", "workspace jarvis",
+            ],
+            steps=[
+                SkillStep("app_open", {"name": "code"}, "Ouvrir VSCode"),
+                SkillStep("app_open", {"name": "wt"}, "Ouvrir Terminal"),
+                SkillStep("open_url", {"url": "https://github.com/Turbo31150/turbo"}, "GitHub Turbo"),
+                SkillStep("lm_cluster_status", {}, "Verifier le cluster"),
+                SkillStep("notify", {"title": "JARVIS", "message": "Workspace Turbo pret."}, "Notification"),
+            ],
+            category="dev",
+        ),
+        Skill(
+            name="rapport_soir",
+            description="Rapport du soir: bilan trading, cluster status, historique actions",
+            triggers=[
+                "rapport du soir", "bilan du soir", "briefing soir",
+                "resume de la journee", "bilan journee",
+            ],
+            steps=[
+                SkillStep("trading_status", {}, "Bilan trading"),
+                SkillStep("trading_positions", {}, "Positions restantes"),
+                SkillStep("lm_cluster_status", {}, "Status cluster"),
+                SkillStep("system_info", {}, "Status systeme"),
+                SkillStep("action_history", {}, "Historique des actions"),
+            ],
+            category="routine",
+        ),
     ]

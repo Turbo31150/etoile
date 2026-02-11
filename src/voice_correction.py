@@ -91,6 +91,26 @@ IMPLICIT_COMMANDS: dict[str, str] = {
     "find": "recherche dans la page",
     "redo": "refais",
     "trading": "statut trading",
+    # Vague 2 - Commandes implicites
+    "micro": "coupe le micro",
+    "camera": "parametres camera",
+    "zoom": "zoom avant",
+    "print": "imprime",
+    "refresh": "actualise",
+    "rename": "renomme",
+    "delete": "supprime",
+    "lock": "verrouille",
+    "reunion": "mode reunion",
+    "visio": "mode reunion",
+    "focus": "mode focus",
+    "presentation": "mode presentation",
+    "musique": "mets de la musique",
+    "diagnostic": "diagnostic complet",
+    "monitoring": "monitoring complet",
+    "optimisation": "optimise le pc",
+    "stream": "mode stream",
+    "gaming": "mode gaming",
+    "dev": "mode dev",
 }
 
 

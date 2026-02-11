@@ -474,6 +474,74 @@ COMMANDS: list[JarvisCommand] = [
         "taches programmees",
     ], "jarvis_tool", "scheduled_tasks"),
 
+    # ── Mode avion / micro / camera ──
+    JarvisCommand("mode_avion_on", "systeme", "Activer le mode avion", [
+        "active le mode avion", "mode avion", "mode avion on",
+        "coupe le reseau", "active mode avion",
+    ], "ms_settings", "ms-settings:network-airplanemode"),
+    JarvisCommand("micro_mute", "systeme", "Couper le microphone", [
+        "coupe le micro", "mute le micro", "micro off",
+        "desactive le micro", "silence micro",
+    ], "powershell", "Add-Type -TypeDefinition 'using System;using System.Runtime.InteropServices;public class A{[DllImport(\"user32.dll\")]public static extern void keybd_event(byte k,byte s,int f,int e);}'; [A]::keybd_event(0xAD,0,0,0); [A]::keybd_event(0xAD,0,2,0)"),
+    JarvisCommand("micro_unmute", "systeme", "Reactiver le microphone", [
+        "reactive le micro", "unmute micro", "micro on",
+        "active le micro", "rallume le micro",
+    ], "powershell", "Add-Type -TypeDefinition 'using System;using System.Runtime.InteropServices;public class A{[DllImport(\"user32.dll\")]public static extern void keybd_event(byte k,byte s,int f,int e);}'; [A]::keybd_event(0xAD,0,0,0); [A]::keybd_event(0xAD,0,2,0)"),
+    JarvisCommand("param_camera", "systeme", "Parametres camera", [
+        "parametres camera", "reglages camera", "config camera",
+        "ouvre les parametres camera",
+    ], "ms_settings", "ms-settings:privacy-webcam"),
+
+    # ── Bureaux virtuels avances ──
+    JarvisCommand("nouveau_bureau", "systeme", "Creer un nouveau bureau virtuel", [
+        "nouveau bureau", "cree un bureau", "ajoute un bureau",
+        "nouveau bureau virtuel", "new desktop",
+    ], "hotkey", "ctrl+win+d"),
+    JarvisCommand("fermer_bureau", "systeme", "Fermer le bureau virtuel actif", [
+        "ferme le bureau", "ferme ce bureau", "supprime le bureau",
+        "ferme le bureau virtuel", "close desktop",
+    ], "hotkey", "ctrl+win+F4"),
+
+    # ── Navigation/Edition supplementaire ──
+    JarvisCommand("zoom_avant", "systeme", "Zoomer", [
+        "zoom avant", "zoom plus", "agrandis", "zoome",
+        "plus gros",
+    ], "hotkey", "ctrl++"),
+    JarvisCommand("zoom_arriere", "systeme", "Dezoomer", [
+        "zoom arriere", "zoom moins", "retrecis", "dezoome",
+        "plus petit",
+    ], "hotkey", "ctrl+-"),
+    JarvisCommand("zoom_reset", "systeme", "Reinitialiser le zoom", [
+        "zoom normal", "zoom reset", "taille normale",
+        "reinitialise le zoom",
+    ], "hotkey", "ctrl+0"),
+    JarvisCommand("imprimer", "systeme", "Imprimer", [
+        "imprime", "imprimer", "print", "lance l'impression",
+        "ctrl p",
+    ], "hotkey", "ctrl+p"),
+    JarvisCommand("renommer", "systeme", "Renommer le fichier selectionne", [
+        "renomme", "renommer", "rename",
+        "renomme le fichier", "change le nom",
+    ], "hotkey", "F2"),
+    JarvisCommand("supprimer", "systeme", "Supprimer le fichier selectionne", [
+        "supprime", "supprimer", "delete",
+        "envoie a la corbeille", "mets a la corbeille",
+    ], "hotkey", "delete"),
+    JarvisCommand("proprietes", "systeme", "Proprietes du fichier selectionne", [
+        "proprietes", "proprietes du fichier", "infos fichier",
+        "details du fichier",
+    ], "hotkey", "alt+enter"),
+    JarvisCommand("actualiser", "systeme", "Actualiser la page ou le dossier", [
+        "actualise", "rafraichis", "refresh", "recharge",
+        "actualiser", "F5",
+    ], "hotkey", "F5"),
+
+    # ── Verrouillage rapide ──
+    JarvisCommand("verrouiller_rapide", "systeme", "Verrouiller le PC rapidement", [
+        "verrouille", "lock", "verrouille vite",
+        "bloque l'ecran",
+    ], "hotkey", "win+l"),
+
     # ══════════════════════════════════════════════════════════════════════
     # TRADING & IA (10 commandes)
     # ══════════════════════════════════════════════════════════════════════
@@ -840,6 +908,28 @@ VOICE_CORRECTIONS: dict[str, str] = {
     # Bureau virtuel
     "burot": "bureau",
     "buro": "bureau",
+    # Mode avion / Micro / Camera
+    "mod avion": "mode avion",
+    "mode avillion": "mode avion",
+    "mikro": "micro",
+    "micro phone": "microphone",
+    "kamera": "camera",
+    "camerra": "camera",
+    # Zoom
+    "zoome": "zoom",
+    "zooome": "zoom",
+    # Imprimer
+    "impprime": "imprime",
+    "imprimme": "imprime",
+    # Actualiser
+    "rafraichi": "rafraichis",
+    "refraichi": "rafraichis",
+    "refrech": "refresh",
+    # Reunion
+    "reunion": "reunion",
+    "reunnion": "reunion",
+    "visio": "visio",
+    "visioconference": "visioconference",
 }
 
 

@@ -990,5 +990,629 @@
     "last_used": 0.0,
     "success_rate": 1.0,
     "confirm": false
+  },
+  {
+    "name": "mode_reunion",
+    "description": "Mode reunion: ouvre Teams/Zoom, coupe micro, check camera, volume bas",
+    "triggers": [
+      "mode reunion",
+      "lance la reunion",
+      "session visio",
+      "mode visio",
+      "visioconference",
+      "mode meeting"
+    ],
+    "steps": [
+      {
+        "tool": "app_open",
+        "args": {
+          "name": "teams"
+        },
+        "description": "Ouvrir Teams",
+        "wait_for_result": true
+      },
+      {
+        "tool": "volume_down",
+        "args": {},
+        "description": "Baisser le volume",
+        "wait_for_result": true
+      },
+      {
+        "tool": "volume_down",
+        "args": {},
+        "description": "Baisser encore",
+        "wait_for_result": true
+      },
+      {
+        "tool": "notify",
+        "args": {
+          "title": "JARVIS",
+          "message": "Mode reunion actif. Micro coupe par defaut."
+        },
+        "description": "Notification",
+        "wait_for_result": true
+      }
+    ],
+    "category": "communication",
+    "created_at": 0.0,
+    "usage_count": 0,
+    "last_used": 0.0,
+    "success_rate": 1.0,
+    "confirm": false
+  },
+  {
+    "name": "mode_communication",
+    "description": "Mode communication: ouvre Discord, Telegram, Gmail",
+    "triggers": [
+      "mode communication",
+      "ouvre les messageries",
+      "mode social",
+      "lance les messageries",
+      "session communication"
+    ],
+    "steps": [
+      {
+        "tool": "app_open",
+        "args": {
+          "name": "discord"
+        },
+        "description": "Ouvrir Discord",
+        "wait_for_result": true
+      },
+      {
+        "tool": "app_open",
+        "args": {
+          "name": "telegram"
+        },
+        "description": "Ouvrir Telegram",
+        "wait_for_result": true
+      },
+      {
+        "tool": "open_url",
+        "args": {
+          "url": "https://mail.google.com"
+        },
+        "description": "Ouvrir Gmail",
+        "wait_for_result": true
+      },
+      {
+        "tool": "notify",
+        "args": {
+          "title": "JARVIS",
+          "message": "Messageries ouvertes."
+        },
+        "description": "Notification",
+        "wait_for_result": true
+      }
+    ],
+    "category": "communication",
+    "created_at": 0.0,
+    "usage_count": 0,
+    "last_used": 0.0,
+    "success_rate": 1.0,
+    "confirm": false
+  },
+  {
+    "name": "pause_cafe",
+    "description": "Pause cafe: sauvegarde, verrouille le PC, coupe le son",
+    "triggers": [
+      "pause cafe",
+      "je fais une pause",
+      "pause",
+      "je reviens",
+      "brb",
+      "afk"
+    ],
+    "steps": [
+      {
+        "tool": "press_hotkey",
+        "args": {
+          "keys": "ctrl+s"
+        },
+        "description": "Sauvegarder",
+        "wait_for_result": true
+      },
+      {
+        "tool": "volume_mute",
+        "args": {},
+        "description": "Couper le son",
+        "wait_for_result": true
+      },
+      {
+        "tool": "lock_screen",
+        "args": {},
+        "description": "Verrouiller le PC",
+        "wait_for_result": true
+      }
+    ],
+    "category": "routine",
+    "created_at": 0.0,
+    "usage_count": 0,
+    "last_used": 0.0,
+    "success_rate": 1.0,
+    "confirm": false
+  },
+  {
+    "name": "retour_pause",
+    "description": "Retour de pause: reactive le son, check notifications, status rapide",
+    "triggers": [
+      "retour de pause",
+      "je suis revenu",
+      "c'est bon je suis la",
+      "retour",
+      "de retour",
+      "je suis de retour"
+    ],
+    "steps": [
+      {
+        "tool": "volume_up",
+        "args": {},
+        "description": "Remettre le son",
+        "wait_for_result": true
+      },
+      {
+        "tool": "volume_up",
+        "args": {},
+        "description": "Volume normal",
+        "wait_for_result": true
+      },
+      {
+        "tool": "system_info",
+        "args": {},
+        "description": "Check systeme rapide",
+        "wait_for_result": true
+      },
+      {
+        "tool": "notify",
+        "args": {
+          "title": "JARVIS",
+          "message": "Bon retour. Tout est operationnel."
+        },
+        "description": "Notification",
+        "wait_for_result": true
+      }
+    ],
+    "category": "routine",
+    "created_at": 0.0,
+    "usage_count": 0,
+    "last_used": 0.0,
+    "success_rate": 1.0,
+    "confirm": false
+  },
+  {
+    "name": "mode_ia",
+    "description": "Mode IA: lance LM Studio, check cluster, liste modeles",
+    "triggers": [
+      "mode ia",
+      "mode intelligence artificielle",
+      "session ia",
+      "lance l'ia",
+      "active l'ia",
+      "mode cluster"
+    ],
+    "steps": [
+      {
+        "tool": "app_open",
+        "args": {
+          "name": "lmstudio"
+        },
+        "description": "Lancer LM Studio",
+        "wait_for_result": true
+      },
+      {
+        "tool": "lm_cluster_status",
+        "args": {},
+        "description": "Verifier le cluster",
+        "wait_for_result": true
+      },
+      {
+        "tool": "lm_models",
+        "args": {},
+        "description": "Lister les modeles charges",
+        "wait_for_result": true
+      },
+      {
+        "tool": "notify",
+        "args": {
+          "title": "JARVIS",
+          "message": "Mode IA actif. Cluster verifie."
+        },
+        "description": "Notification",
+        "wait_for_result": true
+      }
+    ],
+    "category": "dev",
+    "created_at": 0.0,
+    "usage_count": 0,
+    "last_used": 0.0,
+    "success_rate": 1.0,
+    "confirm": false
+  },
+  {
+    "name": "deploiement",
+    "description": "Mode deploiement: terminal, status systeme, check services, monitoring",
+    "triggers": [
+      "mode deploiement",
+      "lance le deploiement",
+      "session deploy",
+      "deploy",
+      "deploie",
+      "mode deploy"
+    ],
+    "steps": [
+      {
+        "tool": "app_open",
+        "args": {
+          "name": "wt"
+        },
+        "description": "Ouvrir Terminal",
+        "wait_for_result": true
+      },
+      {
+        "tool": "system_info",
+        "args": {},
+        "description": "Check systeme",
+        "wait_for_result": true
+      },
+      {
+        "tool": "list_services",
+        "args": {},
+        "description": "Verifier les services",
+        "wait_for_result": true
+      },
+      {
+        "tool": "network_info",
+        "args": {},
+        "description": "Check reseau",
+        "wait_for_result": true
+      },
+      {
+        "tool": "notify",
+        "args": {
+          "title": "JARVIS",
+          "message": "Mode deploiement pret."
+        },
+        "description": "Notification",
+        "wait_for_result": true
+      }
+    ],
+    "category": "dev",
+    "created_at": 0.0,
+    "usage_count": 0,
+    "last_used": 0.0,
+    "success_rate": 1.0,
+    "confirm": false
+  },
+  {
+    "name": "debug_reseau",
+    "description": "Debug reseau: info reseau, scan wifi, ping, services, IP",
+    "triggers": [
+      "debug reseau",
+      "probleme reseau",
+      "diagnostique reseau",
+      "le reseau marche pas",
+      "pas d'internet",
+      "debug network"
+    ],
+    "steps": [
+      {
+        "tool": "network_info",
+        "args": {},
+        "description": "Infos reseau",
+        "wait_for_result": true
+      },
+      {
+        "tool": "wifi_networks",
+        "args": {},
+        "description": "Scanner Wi-Fi",
+        "wait_for_result": true
+      },
+      {
+        "tool": "ping",
+        "args": {
+          "host": "8.8.8.8"
+        },
+        "description": "Ping Google DNS",
+        "wait_for_result": true
+      },
+      {
+        "tool": "ping",
+        "args": {
+          "host": "192.168.1.1"
+        },
+        "description": "Ping gateway",
+        "wait_for_result": true
+      },
+      {
+        "tool": "notify",
+        "args": {
+          "title": "JARVIS",
+          "message": "Diagnostic reseau termine."
+        },
+        "description": "Notification",
+        "wait_for_result": true
+      }
+    ],
+    "category": "systeme",
+    "created_at": 0.0,
+    "usage_count": 0,
+    "last_used": 0.0,
+    "success_rate": 1.0,
+    "confirm": false
+  },
+  {
+    "name": "mode_lecture",
+    "description": "Mode lecture: ferme distractions, mode nuit, volume bas, zoom texte",
+    "triggers": [
+      "mode lecture",
+      "mode etude",
+      "session lecture",
+      "je lis",
+      "mode read",
+      "mode lire"
+    ],
+    "steps": [
+      {
+        "tool": "close_app",
+        "args": {
+          "name": "discord"
+        },
+        "description": "Fermer Discord",
+        "wait_for_result": true
+      },
+      {
+        "tool": "close_app",
+        "args": {
+          "name": "spotify"
+        },
+        "description": "Fermer Spotify",
+        "wait_for_result": true
+      },
+      {
+        "tool": "press_hotkey",
+        "args": {
+          "keys": "win+a"
+        },
+        "description": "Mode nuit",
+        "wait_for_result": true
+      },
+      {
+        "tool": "volume_down",
+        "args": {},
+        "description": "Baisser le volume",
+        "wait_for_result": true
+      },
+      {
+        "tool": "volume_down",
+        "args": {},
+        "description": "Volume minimal",
+        "wait_for_result": true
+      },
+      {
+        "tool": "notify",
+        "args": {
+          "title": "JARVIS",
+          "message": "Mode lecture actif."
+        },
+        "description": "Notification",
+        "wait_for_result": true
+      }
+    ],
+    "category": "productivite",
+    "created_at": 0.0,
+    "usage_count": 0,
+    "last_used": 0.0,
+    "success_rate": 1.0,
+    "confirm": false
+  },
+  {
+    "name": "update_systeme",
+    "description": "Preparation mise a jour: sauvegarde, check updates, check espace disque",
+    "triggers": [
+      "update systeme",
+      "mise a jour systeme",
+      "prepare les updates",
+      "mets a jour le pc",
+      "lance les mises a jour"
+    ],
+    "steps": [
+      {
+        "tool": "press_hotkey",
+        "args": {
+          "keys": "ctrl+s"
+        },
+        "description": "Sauvegarder le travail",
+        "wait_for_result": true
+      },
+      {
+        "tool": "system_info",
+        "args": {},
+        "description": "Check systeme",
+        "wait_for_result": true
+      },
+      {
+        "tool": "powershell_run",
+        "args": {
+          "command": "Get-CimInstance Win32_LogicalDisk | Select DeviceID, @{N='Free(GB)';E={[math]::Round($_.FreeSpace/1GB,1)}} | Out-String"
+        },
+        "description": "Espace disque",
+        "wait_for_result": true
+      },
+      {
+        "tool": "notify",
+        "args": {
+          "title": "JARVIS",
+          "message": "Systeme pret pour mise a jour."
+        },
+        "description": "Notification",
+        "wait_for_result": true
+      }
+    ],
+    "category": "systeme",
+    "created_at": 0.0,
+    "usage_count": 0,
+    "last_used": 0.0,
+    "success_rate": 1.0,
+    "confirm": false
+  },
+  {
+    "name": "mode_recherche",
+    "description": "Mode recherche: ouvre Chrome, Google, multiple onglets, presse-papier",
+    "triggers": [
+      "mode recherche",
+      "session recherche",
+      "lance les recherches",
+      "mode investigation",
+      "je recherche"
+    ],
+    "steps": [
+      {
+        "tool": "app_open",
+        "args": {
+          "name": "chrome"
+        },
+        "description": "Ouvrir Chrome",
+        "wait_for_result": true
+      },
+      {
+        "tool": "open_url",
+        "args": {
+          "url": "https://www.google.com"
+        },
+        "description": "Google",
+        "wait_for_result": true
+      },
+      {
+        "tool": "open_url",
+        "args": {
+          "url": "https://www.perplexity.ai"
+        },
+        "description": "Perplexity",
+        "wait_for_result": true
+      },
+      {
+        "tool": "notify",
+        "args": {
+          "title": "JARVIS",
+          "message": "Mode recherche actif. Chrome + Perplexity."
+        },
+        "description": "Notification",
+        "wait_for_result": true
+      }
+    ],
+    "category": "productivite",
+    "created_at": 0.0,
+    "usage_count": 0,
+    "last_used": 0.0,
+    "success_rate": 1.0,
+    "confirm": false
+  },
+  {
+    "name": "workspace_turbo",
+    "description": "Workspace JARVIS Turbo: ouvre le projet, terminal, cluster check",
+    "triggers": [
+      "workspace turbo",
+      "ouvre turbo",
+      "session turbo",
+      "lance turbo",
+      "mode turbo",
+      "workspace jarvis"
+    ],
+    "steps": [
+      {
+        "tool": "app_open",
+        "args": {
+          "name": "code"
+        },
+        "description": "Ouvrir VSCode",
+        "wait_for_result": true
+      },
+      {
+        "tool": "app_open",
+        "args": {
+          "name": "wt"
+        },
+        "description": "Ouvrir Terminal",
+        "wait_for_result": true
+      },
+      {
+        "tool": "open_url",
+        "args": {
+          "url": "https://github.com/Turbo31150/turbo"
+        },
+        "description": "GitHub Turbo",
+        "wait_for_result": true
+      },
+      {
+        "tool": "lm_cluster_status",
+        "args": {},
+        "description": "Verifier le cluster",
+        "wait_for_result": true
+      },
+      {
+        "tool": "notify",
+        "args": {
+          "title": "JARVIS",
+          "message": "Workspace Turbo pret."
+        },
+        "description": "Notification",
+        "wait_for_result": true
+      }
+    ],
+    "category": "dev",
+    "created_at": 0.0,
+    "usage_count": 0,
+    "last_used": 0.0,
+    "success_rate": 1.0,
+    "confirm": false
+  },
+  {
+    "name": "rapport_soir",
+    "description": "Rapport du soir: bilan trading, cluster status, historique actions",
+    "triggers": [
+      "rapport du soir",
+      "bilan du soir",
+      "briefing soir",
+      "resume de la journee",
+      "bilan journee"
+    ],
+    "steps": [
+      {
+        "tool": "trading_status",
+        "args": {},
+        "description": "Bilan trading",
+        "wait_for_result": true
+      },
+      {
+        "tool": "trading_positions",
+        "args": {},
+        "description": "Positions restantes",
+        "wait_for_result": true
+      },
+      {
+        "tool": "lm_cluster_status",
+        "args": {},
+        "description": "Status cluster",
+        "wait_for_result": true
+      },
+      {
+        "tool": "system_info",
+        "args": {},
+        "description": "Status systeme",
+        "wait_for_result": true
+      },
+      {
+        "tool": "action_history",
+        "args": {},
+        "description": "Historique des actions",
+        "wait_for_result": true
+      }
+    ],
+    "category": "routine",
+    "created_at": 0.0,
+    "usage_count": 0,
+    "last_used": 0.0,
+    "success_rate": 1.0,
+    "confirm": false
   }
 ]
