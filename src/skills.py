@@ -1237,4 +1237,55 @@ def _default_skills() -> list[Skill]:
             ],
             category="productivite",
         ),
+
+        # ── VAGUE 11: Pipelines hardware / diagnostic complet ──
+
+        Skill(
+            name="inventaire_hardware",
+            description="Inventaire hardware complet: CPU, RAM, GPU, carte mere, BIOS, disques",
+            triggers=[
+                "inventaire hardware", "specs completes", "tout le hardware",
+                "details materiel", "fiche technique pc",
+            ],
+            steps=[
+                SkillStep("powershell_run", {"command": "Get-CimInstance Win32_Processor | Select Name, NumberOfCores, MaxClockSpeed | Out-String"}, "CPU"),
+                SkillStep("powershell_run", {"command": "Get-CimInstance Win32_PhysicalMemory | Select Manufacturer, Capacity, Speed | Out-String"}, "RAM"),
+                SkillStep("gpu_info", {}, "GPU"),
+                SkillStep("powershell_run", {"command": "Get-CimInstance Win32_BaseBoard | Select Manufacturer, Product | Out-String"}, "Carte mere"),
+                SkillStep("powershell_run", {"command": "Get-PhysicalDisk | Select FriendlyName, MediaType, HealthStatus, Size | Out-String"}, "Disques"),
+                SkillStep("powershell_run", {"command": "Get-CimInstance Win32_BIOS | Select SMBIOSBIOSVersion | Out-String"}, "BIOS"),
+                SkillStep("notify", {"title": "JARVIS", "message": "Inventaire hardware complet termine."}, "Notification"),
+            ],
+            category="systeme",
+        ),
+        Skill(
+            name="check_performances",
+            description="Check performances: CPU load, RAM, top processus, GPU temp",
+            triggers=[
+                "check performances", "comment tourne le pc", "performances",
+                "le pc rame", "c'est lent",
+            ],
+            steps=[
+                SkillStep("powershell_run", {"command": "$cpu = (Get-CimInstance Win32_Processor).LoadPercentage; \"CPU: $cpu%\""}, "CPU load"),
+                SkillStep("powershell_run", {"command": "$os = Get-CimInstance Win32_OperatingSystem; $used = [math]::Round(($os.TotalVisibleMemorySize - $os.FreePhysicalMemory)/1MB,1); \"RAM utilisee: $used GB\""}, "RAM"),
+                SkillStep("powershell_run", {"command": "Get-Process | Sort WorkingSet64 -Desc | Select -First 5 Name, @{N='MB';E={[math]::Round($_.WorkingSet64/1MB)}} | Out-String"}, "Top 5 RAM"),
+                SkillStep("gpu_info", {}, "GPU"),
+                SkillStep("notify", {"title": "JARVIS", "message": "Check performances termine."}, "Notification"),
+            ],
+            category="systeme",
+        ),
+        Skill(
+            name="rapport_batterie",
+            description="Rapport batterie complet: niveau, sante, estimation autonomie",
+            triggers=[
+                "rapport batterie", "etat batterie complet", "batterie detaillee",
+                "autonomie restante", "check batterie",
+            ],
+            steps=[
+                SkillStep("powershell_run", {"command": "$b = Get-CimInstance Win32_Battery; if ($b) { \"Niveau: $($b.EstimatedChargeRemaining)%`nStatut: $($b.BatteryStatus)`nEstimation: $($b.EstimatedRunTime) min\" } else { 'PC fixe - pas de batterie' }"}, "Niveau batterie"),
+                SkillStep("powershell_run", {"command": "powercfg /batteryreport /output $env:TEMP\\battery.html 2>$null; 'Rapport genere dans Temp'"}, "Rapport batterie"),
+                SkillStep("notify", {"title": "JARVIS", "message": "Rapport batterie genere."}, "Notification"),
+            ],
+            category="systeme",
+        ),
     ]

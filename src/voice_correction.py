@@ -205,6 +205,15 @@ IMPLICIT_COMMANDS: dict[str, str] = {
     "minuscules": "en minuscules",
     "ecrans": "etends l'ecran",
     "dupliquer": "duplique l'ecran",
+    # Vague 11 - Hardware / RAM / CPU
+    "ram": "utilisation ram",
+    "cpu": "utilisation cpu",
+    "processeur": "info cpu",
+    "batterie": "niveau de batterie",
+    "bios": "info bios",
+    "motherboard": "info carte mere",
+    "gpu": "info gpu detaille",
+    "ssd": "sante des disques",
 }
 
 

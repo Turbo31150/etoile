@@ -1128,6 +1128,64 @@ COMMANDS: list[JarvisCommand] = [
         "lowercase",
     ], "powershell", "$t = Get-Clipboard; Set-Clipboard ($t.ToLower()); 'Texte converti en minuscules'"),
 
+    # ── Vague 11: Hardware / Memoire / CPU / Batterie / Temperatures ──
+    JarvisCommand("ram_usage", "systeme", "Utilisation de la RAM", [
+        "utilisation ram", "combien de ram", "memoire utilisee",
+        "ram disponible", "etat de la ram",
+    ], "powershell", "$os = Get-CimInstance Win32_OperatingSystem; $total = [math]::Round($os.TotalVisibleMemorySize/1MB,1); $free = [math]::Round($os.FreePhysicalMemory/1MB,1); $used = $total - $free; \"RAM: $used/$total GB utilise ($free GB libre)\""),
+    JarvisCommand("cpu_usage", "systeme", "Utilisation du processeur", [
+        "utilisation cpu", "charge du processeur", "combien de cpu",
+        "cpu utilise", "etat du processeur",
+    ], "powershell", "$cpu = (Get-CimInstance Win32_Processor).LoadPercentage; \"CPU: $cpu% utilise\""),
+    JarvisCommand("cpu_info", "systeme", "Informations sur le processeur", [
+        "quel processeur", "info cpu", "nom du processeur",
+        "details cpu", "specs processeur",
+    ], "powershell", "Get-CimInstance Win32_Processor | Select Name, NumberOfCores, NumberOfLogicalProcessors, MaxClockSpeed | Out-String"),
+    JarvisCommand("ram_info", "systeme", "Informations detaillees sur la RAM", [
+        "info ram", "details ram", "combien de barrettes",
+        "specs ram", "type de ram",
+    ], "powershell", "Get-CimInstance Win32_PhysicalMemory | Select Manufacturer, Capacity, Speed, MemoryType | Out-String"),
+    JarvisCommand("batterie_niveau", "systeme", "Niveau de batterie", [
+        "niveau de batterie", "combien de batterie", "batterie restante",
+        "pourcentage batterie", "etat batterie",
+    ], "powershell", "$b = Get-CimInstance Win32_Battery; if ($b) { \"Batterie: $($b.EstimatedChargeRemaining)% - $($b.BatteryStatus)\" } else { 'Pas de batterie detectee (PC fixe)' }"),
+    JarvisCommand("disque_sante", "systeme", "Sante des disques (SMART)", [
+        "sante des disques", "etat des disques", "smart disque",
+        "sante ssd", "sante hdd",
+    ], "powershell", "Get-PhysicalDisk | Select FriendlyName, MediaType, HealthStatus, Size | Out-String"),
+    JarvisCommand("carte_mere", "systeme", "Informations carte mere", [
+        "info carte mere", "quelle carte mere", "modele carte mere",
+        "motherboard", "specs carte mere",
+    ], "powershell", "Get-CimInstance Win32_BaseBoard | Select Manufacturer, Product, SerialNumber | Out-String"),
+    JarvisCommand("bios_info", "systeme", "Informations BIOS", [
+        "info bios", "version bios", "quel bios",
+        "details bios", "bios version",
+    ], "powershell", "Get-CimInstance Win32_BIOS | Select Manufacturer, SMBIOSBIOSVersion, ReleaseDate | Out-String"),
+    JarvisCommand("top_ram", "systeme", "Top 10 processus par RAM", [
+        "quoi consomme la ram", "top ram", "processus gourmands ram",
+        "qui mange la ram", "plus gros en memoire",
+    ], "powershell", "Get-Process | Sort WorkingSet64 -Descending | Select -First 10 Name, @{N='RAM(MB)';E={[math]::Round($_.WorkingSet64/1MB,0)}} | Out-String"),
+    JarvisCommand("top_cpu", "systeme", "Top 10 processus par CPU", [
+        "quoi consomme le cpu", "top cpu", "processus gourmands cpu",
+        "qui mange le cpu", "plus gros en cpu",
+    ], "powershell", "Get-Process | Sort CPU -Descending | Select -First 10 Name, @{N='CPU(s)';E={[math]::Round($_.CPU,1)}} | Out-String"),
+    JarvisCommand("carte_graphique", "systeme", "Informations carte graphique", [
+        "quelle carte graphique", "info gpu detaille", "specs gpu",
+        "details carte graphique", "nom de la carte graphique",
+    ], "powershell", "Get-CimInstance Win32_VideoController | Select Name, DriverVersion, AdapterRAM, VideoProcessor | Out-String"),
+    JarvisCommand("espace_dossier", "fichiers", "Taille d'un dossier", [
+        "taille du dossier {dossier}", "combien pese {dossier}",
+        "espace utilise par {dossier}", "poids du dossier {dossier}",
+    ], "powershell", "$s = (Get-ChildItem '{dossier}' -Recurse -ErrorAction SilentlyContinue | Measure-Object Length -Sum).Sum / 1GB; \"Taille: $([math]::Round($s,2)) GB\"", ["dossier"]),
+    JarvisCommand("nombre_fichiers", "fichiers", "Compter les fichiers dans un dossier", [
+        "combien de fichiers dans {dossier}", "nombre de fichiers {dossier}",
+        "compte les fichiers dans {dossier}",
+    ], "powershell", "$n = (Get-ChildItem '{dossier}' -Recurse -File -ErrorAction SilentlyContinue).Count; \"$n fichiers dans {dossier}\"", ["dossier"]),
+    JarvisCommand("windows_version", "systeme", "Version exacte de Windows", [
+        "version de windows", "quelle version windows",
+        "build windows", "windows version", "quel windows",
+    ], "powershell", "[System.Environment]::OSVersion.VersionString + ' - Build ' + (Get-ItemProperty 'HKLM:\\SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion').DisplayVersion"),
+
     # ══════════════════════════════════════════════════════════════════════
     # TRADING & IA (10 commandes)
     # ══════════════════════════════════════════════════════════════════════
@@ -1688,6 +1746,24 @@ VOICE_CORRECTIONS: dict[str, str] = {
     "sheutdaoune": "shutdown",
     "ecran externe": "ecran externe",
     "displai": "display",
+    # Vague 11 — Hardware / RAM / CPU / Batterie
+    "rame": "ram",
+    "ramm": "ram",
+    "processeure": "processeur",
+    "processeurr": "processeur",
+    "batterie": "batterie",
+    "battri": "batterie",
+    "batteri": "batterie",
+    "carte maire": "carte mere",
+    "carte merre": "carte mere",
+    "bioss": "bios",
+    "bayoss": "bios",
+    "carte grafique": "carte graphique",
+    "carte graphik": "carte graphique",
+    "gpuu": "gpu",
+    "essesdee": "ssd",
+    "hardisque": "hdd",
+    "smartte": "smart",
 }
 
 
