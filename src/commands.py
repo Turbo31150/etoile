@@ -1186,6 +1186,64 @@ COMMANDS: list[JarvisCommand] = [
         "build windows", "windows version", "quel windows",
     ], "powershell", "[System.Environment]::OSVersion.VersionString + ' - Build ' + (Get-ItemProperty 'HKLM:\\SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion').DisplayVersion"),
 
+    # ── Vague 12: Chrome avance / Fenetres / Accessibilite etendue ──
+    JarvisCommand("chrome_favoris", "navigation", "Ouvrir les favoris Chrome", [
+        "ouvre les favoris", "mes favoris", "bookmarks",
+        "affiche les favoris", "gestionnaire de favoris",
+    ], "hotkey", "ctrl+shift+o"),
+    JarvisCommand("chrome_telechargements", "navigation", "Ouvrir les telechargements Chrome", [
+        "telechargements chrome", "mes telechargements chrome",
+        "fichiers telecharges", "downloads chrome",
+    ], "hotkey", "ctrl+j"),
+    JarvisCommand("chrome_plein_ecran", "navigation", "Chrome en plein ecran (F11)", [
+        "plein ecran", "chrome plein ecran", "fullscreen",
+        "mode plein ecran", "f11",
+    ], "hotkey", "f11"),
+    JarvisCommand("chrome_zoom_plus", "navigation", "Zoom avant Chrome", [
+        "zoom avant chrome", "agrandir la page", "plus grand",
+        "zoom plus", "ctrl plus",
+    ], "hotkey", "ctrl+plus"),
+    JarvisCommand("chrome_zoom_moins", "navigation", "Zoom arriere Chrome", [
+        "zoom arriere chrome", "reduire la page", "plus petit",
+        "zoom moins", "ctrl moins",
+    ], "hotkey", "ctrl+minus"),
+    JarvisCommand("chrome_zoom_reset", "navigation", "Reinitialiser le zoom Chrome", [
+        "zoom normal", "zoom 100", "reinitialise le zoom",
+        "taille normale", "ctrl zero",
+    ], "hotkey", "ctrl+0"),
+    JarvisCommand("fenetre_haut_gauche", "fenetre", "Fenetre en haut a gauche", [
+        "fenetre en haut a gauche", "snap haut gauche",
+        "coin haut gauche", "top left",
+    ], "powershell", "Add-Type -TypeDefinition 'using System; using System.Runtime.InteropServices; public class K { [DllImport(\"user32.dll\")] public static extern void keybd_event(byte vk, byte scan, int flags, int extra); }'; [K]::keybd_event(0x5B,0,0,0); [K]::keybd_event(0x25,0,0,0); [K]::keybd_event(0x25,0,2,0); [K]::keybd_event(0x5B,0,2,0); Start-Sleep -Milliseconds 300; [K]::keybd_event(0x5B,0,0,0); [K]::keybd_event(0x26,0,0,0); [K]::keybd_event(0x26,0,2,0); [K]::keybd_event(0x5B,0,2,0)"),
+    JarvisCommand("fenetre_haut_droite", "fenetre", "Fenetre en haut a droite", [
+        "fenetre en haut a droite", "snap haut droite",
+        "coin haut droite", "top right",
+    ], "powershell", "Add-Type -TypeDefinition 'using System; using System.Runtime.InteropServices; public class K { [DllImport(\"user32.dll\")] public static extern void keybd_event(byte vk, byte scan, int flags, int extra); }'; [K]::keybd_event(0x5B,0,0,0); [K]::keybd_event(0x27,0,0,0); [K]::keybd_event(0x27,0,2,0); [K]::keybd_event(0x5B,0,2,0); Start-Sleep -Milliseconds 300; [K]::keybd_event(0x5B,0,0,0); [K]::keybd_event(0x26,0,0,0); [K]::keybd_event(0x26,0,2,0); [K]::keybd_event(0x5B,0,2,0)"),
+    JarvisCommand("fenetre_bas_gauche", "fenetre", "Fenetre en bas a gauche", [
+        "fenetre en bas a gauche", "snap bas gauche",
+        "coin bas gauche", "bottom left",
+    ], "powershell", "Add-Type -TypeDefinition 'using System; using System.Runtime.InteropServices; public class K { [DllImport(\"user32.dll\")] public static extern void keybd_event(byte vk, byte scan, int flags, int extra); }'; [K]::keybd_event(0x5B,0,0,0); [K]::keybd_event(0x25,0,0,0); [K]::keybd_event(0x25,0,2,0); [K]::keybd_event(0x5B,0,2,0); Start-Sleep -Milliseconds 300; [K]::keybd_event(0x5B,0,0,0); [K]::keybd_event(0x28,0,0,0); [K]::keybd_event(0x28,0,2,0); [K]::keybd_event(0x5B,0,2,0)"),
+    JarvisCommand("fenetre_bas_droite", "fenetre", "Fenetre en bas a droite", [
+        "fenetre en bas a droite", "snap bas droite",
+        "coin bas droite", "bottom right",
+    ], "powershell", "Add-Type -TypeDefinition 'using System; using System.Runtime.InteropServices; public class K { [DllImport(\"user32.dll\")] public static extern void keybd_event(byte vk, byte scan, int flags, int extra); }'; [K]::keybd_event(0x5B,0,0,0); [K]::keybd_event(0x27,0,0,0); [K]::keybd_event(0x27,0,2,0); [K]::keybd_event(0x5B,0,2,0); Start-Sleep -Milliseconds 300; [K]::keybd_event(0x5B,0,0,0); [K]::keybd_event(0x28,0,0,0); [K]::keybd_event(0x28,0,2,0); [K]::keybd_event(0x5B,0,2,0)"),
+    JarvisCommand("taille_texte_grand", "accessibilite", "Agrandir la taille du texte systeme", [
+        "texte plus grand", "agrandis le texte", "taille texte grande",
+        "texte plus gros", "augmente la taille du texte",
+    ], "ms_settings", "ms-settings:easeofaccess-display"),
+    JarvisCommand("clavier_virtuel", "accessibilite", "Ouvrir le clavier virtuel", [
+        "clavier virtuel", "ouvre le clavier virtuel", "clavier a l'ecran",
+        "on screen keyboard", "clavier tactile",
+    ], "powershell", "Start-Process osk"),
+    JarvisCommand("filtre_couleur", "accessibilite", "Activer/desactiver le filtre de couleur", [
+        "filtre de couleur", "active le filtre couleur", "mode daltonien",
+        "filtre daltonien", "accessibilite couleur",
+    ], "ms_settings", "ms-settings:easeofaccess-colorfilter"),
+    JarvisCommand("sous_titres", "accessibilite", "Parametres des sous-titres", [
+        "sous-titres", "parametres sous-titres", "active les sous-titres",
+        "closed captions", "legende",
+    ], "ms_settings", "ms-settings:easeofaccess-closedcaptioning"),
+
     # ══════════════════════════════════════════════════════════════════════
     # TRADING & IA (10 commandes)
     # ══════════════════════════════════════════════════════════════════════
@@ -1764,6 +1822,21 @@ VOICE_CORRECTIONS: dict[str, str] = {
     "essesdee": "ssd",
     "hardisque": "hdd",
     "smartte": "smart",
+    # Vague 12 — Chrome / Fenetres / Accessibilite
+    "favoris": "favoris",
+    "favori": "favoris",
+    "bookmarcks": "bookmarks",
+    "boukmarcks": "bookmarks",
+    "foulscrine": "fullscreen",
+    "plein ecrant": "plein ecran",
+    "zoome": "zoom",
+    "zomm": "zoom",
+    "daltonien": "daltonien",
+    "daltonnien": "daltonien",
+    "sous titre": "sous-titres",
+    "soutitres": "sous-titres",
+    "clavier virtuel": "clavier virtuel",
+    "clavie virtuel": "clavier virtuel",
 }
 
 

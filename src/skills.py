@@ -1288,4 +1288,50 @@ def _default_skills() -> list[Skill]:
             ],
             category="systeme",
         ),
+
+        # ── VAGUE 12: Pipelines productivite / accessibilite / navigation ──
+
+        Skill(
+            name="mode_4_fenetres",
+            description="Mode 4 fenetres: snap en 4 coins + luminosite equilibree",
+            triggers=[
+                "mode 4 fenetres", "quatre fenetres", "snap en 4",
+                "4 coins", "quadrillage",
+            ],
+            steps=[
+                SkillStep("press_hotkey", {"keys": "win+tab"}, "Vue des taches"),
+                SkillStep("powershell_run", {"command": "$b = 70; (Get-CimInstance -Namespace root/WMI -ClassName WmiMonitorBrightnessMethods).WmiSetBrightness(1, $b)"}, "Luminosite equilibree"),
+                SkillStep("notify", {"title": "JARVIS", "message": "Mode 4 fenetres - utilisez Snap Layout pour positionner."}, "Notification"),
+            ],
+            category="productivite",
+        ),
+        Skill(
+            name="mode_accessibilite_complet",
+            description="Mode accessibilite complet: loupe + narrateur + contraste + clavier virtuel",
+            triggers=[
+                "mode accessibilite complet", "accessibilite totale",
+                "active toute l'accessibilite", "j'ai besoin d'aide visuelle",
+            ],
+            steps=[
+                SkillStep("powershell_run", {"command": "Start-Process osk"}, "Clavier virtuel"),
+                SkillStep("press_hotkey", {"keys": "win+plus"}, "Loupe"),
+                SkillStep("notify", {"title": "JARVIS", "message": "Mode accessibilite complet actif."}, "Notification"),
+            ],
+            category="accessibilite",
+        ),
+        Skill(
+            name="navigation_rapide",
+            description="Navigation rapide: nouveau tab + favoris + zoom reset",
+            triggers=[
+                "navigation rapide", "chrome rapide", "surf rapide",
+                "nouveau surf",
+            ],
+            steps=[
+                SkillStep("app_open", {"name": "chrome"}, "Ouvrir Chrome"),
+                SkillStep("press_hotkey", {"keys": "ctrl+t"}, "Nouvel onglet"),
+                SkillStep("press_hotkey", {"keys": "ctrl+0"}, "Reset zoom"),
+                SkillStep("notify", {"title": "JARVIS", "message": "Navigation rapide prete."}, "Notification"),
+            ],
+            category="navigation",
+        ),
     ]

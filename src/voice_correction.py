@@ -214,6 +214,13 @@ IMPLICIT_COMMANDS: dict[str, str] = {
     "motherboard": "info carte mere",
     "gpu": "info gpu detaille",
     "ssd": "sante des disques",
+    # Vague 12 - Chrome / Fenetres / Accessibilite
+    "favoris": "ouvre les favoris",
+    "bookmarks": "ouvre les favoris",
+    "fullscreen": "plein ecran",
+    "zoom": "zoom avant",
+    "daltonien": "filtre de couleur",
+    "captions": "sous-titres",
 }
 
 
