@@ -167,10 +167,12 @@ COMMANDS: list[JarvisCommand] = [
     JarvisCommand("media_next", "media", "Piste suivante", [
         "suivant", "piste suivante", "chanson suivante",
         "musique suivante", "next", "morceau suivant",
+        "prochain morceau", "prochaine chanson", "prochaine musique",
     ], "hotkey", "media_next"),
     JarvisCommand("media_previous", "media", "Piste precedente", [
         "precedent", "piste precedente", "chanson precedente",
         "musique precedente", "previous", "morceau precedent",
+        "morceau d'avant", "chanson d'avant", "musique d'avant",
     ], "hotkey", "media_previous"),
     JarvisCommand("volume_haut", "media", "Augmenter le volume", [
         "monte le volume", "augmente le volume", "volume plus fort",
@@ -297,8 +299,9 @@ COMMANDS: list[JarvisCommand] = [
         "arrete le processus {nom}",
     ], "jarvis_tool", "kill_process:{nom}", ["nom"], confirm=True),
     JarvisCommand("wifi_scan", "systeme", "Scanner les reseaux Wi-Fi", [
-        "scan wifi", "reseaux wifi", "quels reseaux wifi",
-        "liste les wifi", "wifi disponible",
+        "scan wifi", "wifi scan", "reseaux wifi", "quels reseaux wifi",
+        "liste les wifi", "wifi disponible", "cherche wifi",
+        "scanne wifi", "scanne les wifi",
     ], "jarvis_tool", "wifi_networks"),
     JarvisCommand("ping_host", "systeme", "Ping un hote", [
         "ping {host}", "teste la connexion a {host}",
@@ -581,9 +584,8 @@ VOICE_CORRECTIONS: dict[str, str] = {
     "brecaoutte": "breakout",
     "snipeur": "sniper",
     "snaiper": "sniper",
-    "scanne": "scanne",
-    "scan": "scanne",
     "skanne": "scanne",
+    "skane": "scan",
     "pipelaïne": "pipeline",
     "pailpelaïne": "pipeline",
     "consencus": "consensus",
