@@ -37,6 +37,14 @@ async def execute_command(cmd: JarvisCommand, params: dict[str, str]) -> str:
         else:
             return f"Impossible d'ouvrir {app_name}: {result['stderr']}"
 
+    if cmd.action_type == "ms_settings":
+        uri = cmd.action
+        result = run_powershell(f"Start-Process '{uri}'", timeout=10)
+        if result["success"]:
+            return f"Parametres ouverts: {uri}"
+        else:
+            return f"Erreur ouverture parametres: {result['stderr']}"
+
     if cmd.action_type == "hotkey":
         action = cmd.action
         for k, v in params.items():
@@ -184,6 +192,39 @@ def _win_arrow_ps(direction: str) -> str:
     )
 
 
+def _win_tab_ps() -> str:
+    """PowerShell to simulate Win+Tab (Task View)."""
+    return (
+        "Add-Type -TypeDefinition 'using System;using System.Runtime.InteropServices;"
+        "public class K{[DllImport(\"user32.dll\")]public static extern void keybd_event(byte k,byte s,int f,int e);}'; "
+        "[K]::keybd_event(0x5B,0,0,0); [K]::keybd_event(0x09,0,0,0); "
+        "[K]::keybd_event(0x09,0,2,0); [K]::keybd_event(0x5B,0,2,0)"
+    )
+
+
+def _ctrl_win_arrow_ps(direction: str) -> str:
+    """PowerShell to simulate Ctrl+Win+Arrow for virtual desktop switching."""
+    vk_map = {"LEFT": "0x25", "RIGHT": "0x27"}
+    vk = vk_map[direction]
+    return (
+        "Add-Type -TypeDefinition 'using System;using System.Runtime.InteropServices;"
+        "public class K{[DllImport(\"user32.dll\")]public static extern void keybd_event(byte k,byte s,int f,int e);}'; "
+        f"[K]::keybd_event(0x11,0,0,0); [K]::keybd_event(0x5B,0,0,0); "
+        f"[K]::keybd_event({vk},0,0,0); [K]::keybd_event({vk},0,2,0); "
+        "[K]::keybd_event(0x5B,0,2,0); [K]::keybd_event(0x11,0,2,0)"
+    )
+
+
+def _win_semicolon_ps() -> str:
+    """PowerShell to simulate Win+; (emoji panel, VK_OEM_1 = 0xBA)."""
+    return (
+        "Add-Type -TypeDefinition 'using System;using System.Runtime.InteropServices;"
+        "public class K{[DllImport(\"user32.dll\")]public static extern void keybd_event(byte k,byte s,int f,int e);}'; "
+        "[K]::keybd_event(0x5B,0,0,0); [K]::keybd_event(0xBA,0,0,0); "
+        "[K]::keybd_event(0xBA,0,2,0); [K]::keybd_event(0x5B,0,2,0)"
+    )
+
+
 def _win_shift_s_ps() -> str:
     """PowerShell to simulate Win+Shift+S (screenshot)."""
     return (
@@ -228,6 +269,17 @@ HOTKEY_MAP: dict[str, str] = {
     "win+left": _win_arrow_ps("LEFT"),
     "win+right": _win_arrow_ps("RIGHT"),
     "win+shift+s": _win_shift_s_ps(),
+    # Win key combos supplementaires (Windows 11)
+    "win+s": _win_hotkey_ps("S"),         # Recherche Windows
+    "win+n": _win_hotkey_ps("N"),         # Centre notifications
+    "win+w": _win_hotkey_ps("W"),         # Widgets
+    "win+v": _win_hotkey_ps("V"),         # Historique presse-papier
+    "win+p": _win_hotkey_ps("P"),         # Projeter ecran
+    "win+tab": _win_tab_ps(),             # Vue des taches
+    "win+;": _win_semicolon_ps(),         # Panneau emojis
+    # Bureaux virtuels
+    "ctrl+win+right": _ctrl_win_arrow_ps("RIGHT"),
+    "ctrl+win+left": _ctrl_win_arrow_ps("LEFT"),
 }
 
 
@@ -284,7 +336,7 @@ async def correct_with_ia(text: str, node_url: str = "http://192.168.1.26:1234")
             resp = await client.post(
                 f"{node_url}/v1/chat/completions",
                 json={
-                    "model": "nvidia/nemotron-3-nano",
+                    "model": "openai/gpt-oss-20b",
                     "messages": [{"role": "user", "content": prompt}],
                     "temperature": 0.1,
                     "max_tokens": 256,

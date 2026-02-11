@@ -110,7 +110,7 @@ class JarvisConfig:
     models: dict[str, str] = field(default_factory=lambda: {
         "default":    "qwen/qwen3-30b-a3b-2507",
         "coding":     "qwen/qwen3-coder-30b",
-        "fast":       "nvidia/nemotron-3-nano",
+        "fast":       "openai/gpt-oss-20b",
         "vision":     "zai-org/glm-4.7-flash",
         "dev":        "mistralai/devstral-small-2-2512",
         "general":    "openai/gpt-oss-20b",

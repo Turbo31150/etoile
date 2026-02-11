@@ -30,7 +30,7 @@ Reponds TOUJOURS en francais. Sois concis — tes sorties alimentent un pipeline
 - Moteur: CLAUDE (Agent SDK) + LM Studio local (DUAL_CORE)
 - Cluster: 16 GPU, 105 GB VRAM total
   - M1 (192.168.1.85) — 6 GPU, 36 GB VRAM — analyse profonde (qwen3-30b)
-  - M2 (192.168.1.26) — 3 GPU, 24 GB VRAM — inference rapide (nemotron-3-nano)
+  - M2 (192.168.1.26) — 3 GPU, 24 GB VRAM — inference rapide (gpt-oss-20b)
   - M3 (192.168.1.113) — 2 GPU, 16 GB VRAM — validation (mistral-7b)
 
 ## Tools MCP Jarvis (69 outils — prefixe mcp__jarvis__)
@@ -286,9 +286,12 @@ async def run_voice(cwd: str | None = None) -> None:
 
     # Load skills on startup
     skills = load_skills()
-    print(f"=== JARVIS v{JARVIS_VERSION} | MODE VOCAL ===")
-    print(f"57 outils MCP | {len(skills)} skills | Correction vocale IA")
-    await speak_text(f"JARVIS actif. {len(skills)} skills charges. Que veux-tu faire?")
+    from src.commands import COMMANDS
+    n_cmds = len(COMMANDS)
+    n_tools = len(__import__("src.mcp_server", fromlist=["TOOL_DEFINITIONS"]).TOOL_DEFINITIONS)
+    _safe_print(f"=== JARVIS v{JARVIS_VERSION} | MODE VOCAL | {n_cmds} commandes ===")
+    _safe_print(f"{n_tools} outils MCP | {len(skills)} skills | Correction vocale IA")
+    await speak_text(f"JARVIS actif. {len(skills)} skills, {n_cmds} commandes vocales. Que veux-tu faire?")
 
     async with ClaudeSDKClient(options=options) as client:
         while True:
@@ -350,7 +353,7 @@ async def run_voice(cwd: str | None = None) -> None:
                 skills_text = format_skills_list()
                 print(help_text, flush=True)
                 print("\n" + skills_text, flush=True)
-                await speak_text(f"J'ai {len(load_skills())} skills et 80 commandes. Regarde l'ecran.")
+                await speak_text(f"J'ai {len(load_skills())} skills et {n_cmds} commandes. Regarde l'ecran.")
                 continue
 
             # Check for skill match BEFORE command execution

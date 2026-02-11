@@ -75,6 +75,22 @@ IMPLICIT_COMMANDS: dict[str, str] = {
     "aide": "aide",
     "stop": "stop",
     "status": "statut du cluster",
+    # Nouvelles commandes implicites
+    "bluetooth": "active le bluetooth",
+    "parametres": "ouvre les parametres",
+    "reglages": "ouvre les reglages",
+    "emojis": "ouvre les emojis",
+    "widgets": "ouvre les widgets",
+    "notifications": "ouvre les notifications",
+    "explorateur": "ouvre l'explorateur de fichiers",
+    "wifi": "scan wifi",
+    "positions": "mes positions",
+    "signaux": "signaux en attente",
+    "services": "liste les services",
+    "save": "sauvegarde",
+    "find": "recherche dans la page",
+    "redo": "refais",
+    "trading": "statut trading",
 }
 
 
@@ -259,7 +275,7 @@ async def full_correction_pipeline(
     raw_text: str,
     use_ia: bool = True,
     ia_url: str = "http://localhost:1234",
-    ia_model: str = "nvidia/nemotron-3-nano",
+    ia_model: str = "openai/gpt-oss-20b",
 ) -> dict[str, Any]:
     """Complete voice correction pipeline.
 
