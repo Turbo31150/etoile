@@ -1004,6 +1004,64 @@ COMMANDS: list[JarvisCommand] = [
         "jupyter lab", "ouvre le notebook",
     ], "browser", "navigate:http://localhost:8888"),
 
+    # ── Vague 9: Clipboard avance / Raccourcis app / Recherche / Automation ──
+    JarvisCommand("clipboard_vider", "systeme", "Vider le presse-papier", [
+        "vide le presse-papier", "efface le clipboard", "nettoie le presse-papier",
+        "clear clipboard",
+    ], "powershell", "Set-Clipboard -Value $null; 'Presse-papier vide'"),
+    JarvisCommand("clipboard_compter", "systeme", "Compter les caracteres du presse-papier", [
+        "combien de caracteres dans le presse-papier", "taille du presse-papier",
+        "longueur du clipboard",
+    ], "powershell", "$c = Get-Clipboard; \"Clipboard: $($c.Length) caracteres\""),
+    JarvisCommand("ouvrir_paint", "app", "Ouvrir Paint", [
+        "ouvre paint", "lance paint", "ouvrir paint", "dessiner",
+    ], "app_open", "mspaint"),
+    JarvisCommand("ouvrir_wordpad", "app", "Ouvrir WordPad", [
+        "ouvre wordpad", "lance wordpad", "ouvrir wordpad",
+    ], "app_open", "wordpad"),
+    JarvisCommand("ouvrir_snipping", "app", "Ouvrir l'Outil Capture", [
+        "ouvre l'outil capture", "lance l'outil capture", "outil de capture",
+        "snipping tool", "capture avancee",
+    ], "app_open", "snippingtool"),
+    JarvisCommand("ouvrir_magnifier", "app", "Ouvrir la loupe Windows", [
+        "ouvre la loupe windows", "loupe windows", "loupe ecran",
+    ], "hotkey", "win+plus"),
+    JarvisCommand("fermer_loupe", "app", "Fermer la loupe Windows", [
+        "ferme la loupe", "desactive la loupe", "arrete la loupe",
+    ], "hotkey", "win+escape"),
+    JarvisCommand("recherche_everywhere", "systeme", "Rechercher partout sur le PC", [
+        "recherche partout {terme}", "cherche partout {terme}",
+        "trouve {terme} sur le pc", "recherche globale {terme}",
+    ], "powershell", "Get-ChildItem -Path C:\\ -Recurse -Filter '*{terme}*' -ErrorAction SilentlyContinue | Select -First 20 FullName | Out-String", ["terme"]),
+    JarvisCommand("historique_commandes", "jarvis", "Voir l'historique des commandes JARVIS", [
+        "historique des commandes", "quelles commandes j'ai utilise",
+        "dernieres commandes", "historique jarvis",
+    ], "powershell", "if (Test-Path 'F:\\BUREAU\\turbo\\data\\action_history.json') { Get-Content 'F:\\BUREAU\\turbo\\data\\action_history.json' | ConvertFrom-Json | Select -Last 10 | Out-String } else { 'Aucun historique' }"),
+    JarvisCommand("tache_planifier", "systeme", "Creer une tache planifiee", [
+        "planifie une tache {nom}", "cree une tache planifiee {nom}",
+        "programme {nom}", "schedule {nom}",
+    ], "powershell", "Write-Output 'Pour creer une tache planifiee, precisez: nom, heure, commande'", ["nom"]),
+    JarvisCommand("variables_utilisateur", "systeme", "Afficher les variables d'environnement utilisateur", [
+        "variables utilisateur", "mes variables", "env utilisateur",
+        "variables d'environnement utilisateur",
+    ], "powershell", "[Environment]::GetEnvironmentVariables('User') | Out-String"),
+    JarvisCommand("chemin_path", "systeme", "Afficher le PATH systeme", [
+        "montre le path", "affiche le path", "variable path",
+        "quel est le path", "path systeme",
+    ], "powershell", "$env:PATH -split ';' | ForEach-Object { $_ } | Out-String"),
+    JarvisCommand("ouvrir_obs", "app", "Ouvrir OBS Studio", [
+        "ouvre obs", "lance obs", "obs studio", "ouvrir obs",
+        "lance le stream",
+    ], "app_open", "obs64"),
+    JarvisCommand("ouvrir_vlc", "app", "Ouvrir VLC Media Player", [
+        "ouvre vlc", "lance vlc", "ouvrir vlc",
+        "lecteur multimedia",
+    ], "app_open", "vlc"),
+    JarvisCommand("ouvrir_7zip", "app", "Ouvrir 7-Zip", [
+        "ouvre 7zip", "lance 7zip", "ouvrir 7zip",
+        "ouvre 7-zip", "gestionnaire d'archives",
+    ], "app_open", "7zFM"),
+
     # ══════════════════════════════════════════════════════════════════════
     # TRADING & IA (10 commandes)
     # ══════════════════════════════════════════════════════════════════════
@@ -1525,6 +1583,28 @@ VOICE_CORRECTIONS: dict[str, str] = {
     "why fi": "wifi",
     "profilz": "profils",
     "profille": "profils",
+    # Vague 9 — Apps / Clipboard / Systeme
+    "peinte": "paint",
+    "painte": "paint",
+    "wordpade": "wordpad",
+    "worpade": "wordpad",
+    "snippinge": "snipping",
+    "snipingtool": "snipping tool",
+    "obss": "obs",
+    "o b s": "obs",
+    "vlcc": "vlc",
+    "7 zip": "7zip",
+    "septzip": "7zip",
+    "sept zip": "7zip",
+    "clipboarde": "clipboard",
+    "clipbord": "clipboard",
+    "presse papie": "presse-papier",
+    "louppe": "loupe",
+    "historike": "historique",
+    "plannifie": "planifie",
+    "planiffie": "planifie",
+    "variablle": "variable",
+    "pathe": "path",
 }
 
 

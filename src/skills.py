@@ -1144,4 +1144,51 @@ def _default_skills() -> list[Skill]:
             category="dev",
             confirm=True,
         ),
+
+        # ── VAGUE 9: Pipelines multimedia / nettoyage / automatisation ──
+
+        Skill(
+            name="mode_stream",
+            description="Mode stream: OBS + micro check + game bar + performance max",
+            triggers=[
+                "mode stream", "lance le stream", "prepare le stream",
+                "streaming", "je vais streamer",
+            ],
+            steps=[
+                SkillStep("app_open", {"name": "obs64"}, "Lancer OBS"),
+                SkillStep("press_hotkey", {"keys": "win+g"}, "Game Bar"),
+                SkillStep("powershell_run", {"command": "powercfg /setactive 8c5e7fda-e8bf-4a96-9a85-a6e23a8c635c 2>$null; 'Mode haute performance'"}, "Performance max"),
+                SkillStep("notify", {"title": "JARVIS", "message": "Mode stream pret. OBS lance."}, "Notification"),
+            ],
+            category="loisir",
+        ),
+        Skill(
+            name="nettoyage_clipboard",
+            description="Nettoyage complet: clipboard + temp + historique recent",
+            triggers=[
+                "nettoyage rapide", "clean rapide", "nettoie vite",
+                "nettoyage clipboard et temp",
+            ],
+            steps=[
+                SkillStep("powershell_run", {"command": "Set-Clipboard -Value $null; 'Clipboard vide'"}, "Vider clipboard"),
+                SkillStep("powershell_run", {"command": "Remove-Item $env:TEMP\\* -Recurse -Force -ErrorAction SilentlyContinue; 'Temp nettoye'"}, "Vider temp"),
+                SkillStep("notify", {"title": "JARVIS", "message": "Nettoyage rapide termine."}, "Notification"),
+            ],
+            category="systeme",
+        ),
+        Skill(
+            name="inventaire_apps",
+            description="Inventaire des applications installees et environnement dev",
+            triggers=[
+                "inventaire applications", "quelles apps sont installees",
+                "liste toutes les applications", "inventaire logiciels",
+            ],
+            steps=[
+                SkillStep("powershell_run", {"command": "Get-Package | Select Name, Version | Sort Name | Out-String"}, "Apps installees"),
+                SkillStep("powershell_run", {"command": "python --version 2>&1; docker --version 2>&1; git --version 2>&1; node --version 2>&1"}, "Versions dev"),
+                SkillStep("powershell_run", {"command": "$env:PATH -split ';' | Where-Object { $_ -ne '' } | Out-String"}, "PATH"),
+                SkillStep("notify", {"title": "JARVIS", "message": "Inventaire applications termine."}, "Notification"),
+            ],
+            category="systeme",
+        ),
     ]

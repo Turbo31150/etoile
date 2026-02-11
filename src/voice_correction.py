@@ -186,6 +186,15 @@ IMPLICIT_COMMANDS: dict[str, str] = {
     "n8n": "ouvre n8n",
     "workflows": "ouvre n8n",
     "profils wifi": "profils wifi",
+    # Vague 9 - Apps / Clipboard / Systeme
+    "paint": "ouvre paint",
+    "obs": "ouvre obs",
+    "vlc": "ouvre vlc",
+    "clipboard": "lis le presse-papier",
+    "path": "montre le path",
+    "archives": "ouvre 7zip",
+    "stream": "ouvre obs",
+    "dessin": "ouvre paint",
 }
 
 
