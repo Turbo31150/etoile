@@ -221,6 +221,15 @@ IMPLICIT_COMMANDS: dict[str, str] = {
     "zoom": "zoom avant",
     "daltonien": "filtre de couleur",
     "captions": "sous-titres",
+    # Vague 13 - Reseau avance / DNS / Ports
+    "ports": "ports ouverts",
+    "arp": "table arp",
+    "nslookup": "nslookup",
+    "routage": "table de routage",
+    "ssl": "certificat ssl",
+    "dns": "vide le cache dns",
+    "ip publique": "mon ip publique",
+    "partages": "partages reseau",
 }
 
 

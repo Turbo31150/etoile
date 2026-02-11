@@ -1334,4 +1334,56 @@ def _default_skills() -> list[Skill]:
             ],
             category="navigation",
         ),
+
+        # ── VAGUE 13: Pipelines reseau avance / securite reseau ──
+
+        Skill(
+            name="audit_reseau",
+            description="Audit reseau: IP publique, DNS, ports ouverts, ARP, vitesse",
+            triggers=[
+                "audit reseau", "analyse le reseau", "securite reseau",
+                "scan reseau complet", "qui est sur mon reseau",
+            ],
+            steps=[
+                SkillStep("powershell_run", {"command": "(Invoke-WebRequest -Uri 'https://api.ipify.org' -UseBasicParsing).Content"}, "IP publique"),
+                SkillStep("network_info", {}, "IP locale"),
+                SkillStep("powershell_run", {"command": "Get-NetTCPConnection -State Listen | Select LocalPort, @{N='Process';E={(Get-Process -Id $_.OwningProcess -ErrorAction SilentlyContinue).Name}} | Sort LocalPort | Select -First 15 | Out-String"}, "Ports ouverts"),
+                SkillStep("powershell_run", {"command": "Get-NetNeighbor | Where State -ne Unreachable | Select IPAddress, LinkLayerAddress | Out-String"}, "Table ARP"),
+                SkillStep("powershell_run", {"command": "Get-NetAdapter | Where Status -eq Up | Select Name, LinkSpeed | Out-String"}, "Vitesse"),
+                SkillStep("notify", {"title": "JARVIS", "message": "Audit reseau termine."}, "Notification"),
+            ],
+            category="systeme",
+        ),
+        Skill(
+            name="optimise_dns",
+            description="Optimisation DNS: flush + passage sur Cloudflare + test",
+            triggers=[
+                "optimise le dns", "dns rapide", "accelere le dns",
+                "internet lent", "dns lent",
+            ],
+            steps=[
+                SkillStep("powershell_run", {"command": "ipconfig /flushdns; 'DNS flush OK'"}, "Flush DNS"),
+                SkillStep("powershell_run", {"command": "Set-DnsClientServerAddress -InterfaceAlias 'Wi-Fi' -ServerAddresses ('1.1.1.1','1.0.0.1'); 'DNS Cloudflare configure'"}, "DNS Cloudflare"),
+                SkillStep("ping", {"host": "google.com"}, "Test connexion"),
+                SkillStep("notify", {"title": "JARVIS", "message": "DNS optimise sur Cloudflare."}, "Notification"),
+            ],
+            category="systeme",
+            confirm=True,
+        ),
+        Skill(
+            name="diagnostic_connexion",
+            description="Diagnostic connexion internet: ping, DNS, IP, vitesse, tracert",
+            triggers=[
+                "diagnostic connexion", "internet ne marche pas",
+                "pas de connexion", "probleme internet", "debug internet",
+            ],
+            steps=[
+                SkillStep("powershell_run", {"command": "Get-NetAdapter | Where Status -eq Up | Select Name, LinkSpeed, Status | Out-String"}, "Carte reseau"),
+                SkillStep("ping", {"host": "8.8.8.8"}, "Ping Google DNS"),
+                SkillStep("powershell_run", {"command": "Resolve-DnsName google.com -ErrorAction SilentlyContinue | Select Name, IPAddress | Out-String"}, "Test DNS"),
+                SkillStep("powershell_run", {"command": "(Invoke-WebRequest -Uri 'https://api.ipify.org' -UseBasicParsing -TimeoutSec 5).Content"}, "IP publique"),
+                SkillStep("notify", {"title": "JARVIS", "message": "Diagnostic connexion termine."}, "Notification"),
+            ],
+            category="systeme",
+        ),
     ]

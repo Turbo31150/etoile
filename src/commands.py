@@ -1244,6 +1244,60 @@ COMMANDS: list[JarvisCommand] = [
         "closed captions", "legende",
     ], "ms_settings", "ms-settings:easeofaccess-closedcaptioning"),
 
+    # ── Vague 13: Reseau avance / DNS / VPN / Partage / Ports ──
+    JarvisCommand("dns_changer_google", "systeme", "Changer DNS vers Google (8.8.8.8)", [
+        "mets le dns google", "change le dns en google", "dns google",
+        "dns 8.8.8.8", "passe sur google dns",
+    ], "powershell", "Set-DnsClientServerAddress -InterfaceAlias 'Wi-Fi' -ServerAddresses ('8.8.8.8','8.8.4.4'); 'DNS Google configure'", confirm=True),
+    JarvisCommand("dns_changer_cloudflare", "systeme", "Changer DNS vers Cloudflare (1.1.1.1)", [
+        "mets le dns cloudflare", "change le dns en cloudflare", "dns cloudflare",
+        "dns 1.1.1.1", "passe sur cloudflare",
+    ], "powershell", "Set-DnsClientServerAddress -InterfaceAlias 'Wi-Fi' -ServerAddresses ('1.1.1.1','1.0.0.1'); 'DNS Cloudflare configure'", confirm=True),
+    JarvisCommand("dns_reset", "systeme", "Remettre le DNS en automatique", [
+        "dns automatique", "reset le dns", "dns par defaut",
+        "dns auto", "remets le dns normal",
+    ], "powershell", "Set-DnsClientServerAddress -InterfaceAlias 'Wi-Fi' -ResetServerAddresses; 'DNS remis en automatique'", confirm=True),
+    JarvisCommand("ports_ouverts", "systeme", "Lister les ports ouverts", [
+        "ports ouverts", "quels ports sont ouverts", "liste les ports",
+        "ports en ecoute", "listening ports",
+    ], "powershell", "Get-NetTCPConnection -State Listen | Select LocalPort, OwningProcess, @{N='Process';E={(Get-Process -Id $_.OwningProcess -ErrorAction SilentlyContinue).Name}} | Sort LocalPort | Out-String"),
+    JarvisCommand("ip_publique", "systeme", "Obtenir l'IP publique", [
+        "mon ip publique", "quelle est mon ip publique", "ip externe",
+        "ip internet", "public ip",
+    ], "powershell", "(Invoke-WebRequest -Uri 'https://api.ipify.org' -UseBasicParsing).Content"),
+    JarvisCommand("partage_reseau", "systeme", "Lister les partages reseau", [
+        "partages reseau", "dossiers partages", "quels dossiers sont partages",
+        "network shares", "smb shares",
+    ], "powershell", "Get-SmbShare | Select Name, Path, Description | Out-String"),
+    JarvisCommand("connexions_actives", "systeme", "Connexions reseau actives", [
+        "connexions actives", "qui est connecte", "connexions etablies",
+        "established connections", "connexions tcp",
+    ], "powershell", "Get-NetTCPConnection -State Established | Select RemoteAddress, RemotePort, OwningProcess, @{N='Process';E={(Get-Process -Id $_.OwningProcess -ErrorAction SilentlyContinue).Name}} | Sort RemoteAddress | Out-String"),
+    JarvisCommand("vitesse_reseau", "systeme", "Vitesse de la carte reseau", [
+        "vitesse reseau", "debit carte reseau", "link speed",
+        "vitesse de connexion", "bande passante",
+    ], "powershell", "Get-NetAdapter | Where Status -eq Up | Select Name, LinkSpeed, MacAddress | Out-String"),
+    JarvisCommand("arp_table", "systeme", "Afficher la table ARP", [
+        "table arp", "arp", "appareils sur le reseau",
+        "qui est sur le reseau", "appareils connectes",
+    ], "powershell", "Get-NetNeighbor | Where State -ne Unreachable | Select IPAddress, LinkLayerAddress, State | Out-String"),
+    JarvisCommand("test_port", "systeme", "Tester si un port est ouvert sur une machine", [
+        "teste le port {port} sur {host}", "port {port} ouvert sur {host}",
+        "check port {port} {host}", "scan port {port} {host}",
+    ], "powershell", "Test-NetConnection -ComputerName '{host}' -Port {port} | Select ComputerName, TcpTestSucceeded, RemotePort | Out-String", ["host", "port"]),
+    JarvisCommand("route_table", "systeme", "Afficher la table de routage", [
+        "table de routage", "routes reseau", "route table",
+        "routing table", "affiche les routes",
+    ], "powershell", "Get-NetRoute | Where DestinationPrefix -ne '::' | Select DestinationPrefix, NextHop, InterfaceAlias | Out-String"),
+    JarvisCommand("nslookup", "systeme", "Resolution DNS d'un domaine", [
+        "nslookup {domaine}", "resous {domaine}", "dns de {domaine}",
+        "ip de {domaine}", "resolve {domaine}",
+    ], "powershell", "Resolve-DnsName '{domaine}' | Select Name, Type, IPAddress | Out-String", ["domaine"]),
+    JarvisCommand("certificat_ssl", "systeme", "Verifier le certificat SSL d'un site", [
+        "certificat ssl de {site}", "check ssl {site}",
+        "verifie le ssl de {site}", "https {site}",
+    ], "powershell", "$r = [Net.HttpWebRequest]::Create('https://{site}'); $r.GetResponse() | Out-Null; $c = $r.ServicePoint.Certificate; \"Emetteur: $($c.Issuer)`nExpire: $($c.GetExpirationDateString())\"", ["site"]),
+
     # ══════════════════════════════════════════════════════════════════════
     # TRADING & IA (10 commandes)
     # ══════════════════════════════════════════════════════════════════════
@@ -1837,6 +1891,25 @@ VOICE_CORRECTIONS: dict[str, str] = {
     "soutitres": "sous-titres",
     "clavier virtuel": "clavier virtuel",
     "clavie virtuel": "clavier virtuel",
+    # Vague 13 — Reseau / DNS / Ports / SSL
+    "cloudeflare": "cloudflare",
+    "cloudflaire": "cloudflare",
+    "cloudflere": "cloudflare",
+    "dieunesse": "dns",
+    "deeness": "dns",
+    "d n s": "dns",
+    "arp": "arp",
+    "arpe": "arp",
+    "essaielle": "ssl",
+    "certificat": "certificat",
+    "certificas": "certificat",
+    "nslookupe": "nslookup",
+    "n s lookup": "nslookup",
+    "routage": "routage",
+    "routaje": "routage",
+    "portt": "port",
+    "ip publique": "ip publique",
+    "ip publiq": "ip publique",
 }
 
 
