@@ -34,14 +34,24 @@ def _error(text: str) -> list[TextContent]:
     return [TextContent(type="text", text=f"ERREUR: {text}")]
 
 
-def _ps(cmd: str) -> str:
-    """Run a PowerShell command and return output."""
+def _ps_sync(cmd: str) -> str:
+    """Run a PowerShell command synchronously and return output."""
     import subprocess
     r = subprocess.run(
         ["powershell", "-NoProfile", "-Command", cmd],
         capture_output=True, text=True, timeout=30,
     )
     return r.stdout.strip() if r.returncode == 0 else f"ERREUR: {r.stderr.strip()}"
+
+
+async def _ps(cmd: str) -> str:
+    """Run a PowerShell command in a thread pool (non-blocking)."""
+    return await asyncio.to_thread(_ps_sync, cmd)
+
+
+async def _run(func, *args):
+    """Run a blocking function in a thread pool to avoid blocking the event loop."""
+    return await asyncio.to_thread(func, *args)
 
 
 # ═══════════════════════════════════════════════════════════════════════════
@@ -127,12 +137,14 @@ async def handle_run_script(args: dict) -> list[TextContent]:
     if name not in SCRIPTS:
         return _error(f"Script inconnu: {name}. Disponibles: {', '.join(SCRIPTS.keys())}")
     import subprocess
-    try:
+    def _do():
         r = subprocess.run(
             [sys.executable, str(SCRIPTS[name])] + args.get("args", "").split(),
             capture_output=True, text=True, timeout=120, cwd=str(SCRIPTS[name].parent),
         )
-        return _text(r.stdout[:4000] if r.returncode == 0 else f"ERREUR: {r.stderr[:2000]}")
+        return r.stdout[:4000] if r.returncode == 0 else f"ERREUR: {r.stderr[:2000]}"
+    try:
+        return _text(await asyncio.to_thread(_do))
     except Exception as e:
         return _error(str(e))
 
@@ -147,197 +159,198 @@ async def handle_list_project_paths(args: dict) -> list[TextContent]:
     return _text(f"Projets ({len(PATHS)}):\n" + "\n".join(lines))
 
 
-# ── Windows tools (delegate to PowerShell) ────────────────────────────────
+# ── Windows tools (delegate to PowerShell via thread pool) ─────────────────
 
 async def handle_open_app(args: dict) -> list[TextContent]:
     from src.windows import open_application
-    return _text(open_application(args["name"]))
+    return _text(await _run(open_application, args["name"]))
 
 async def handle_close_app(args: dict) -> list[TextContent]:
     from src.windows import close_application
-    return _text(close_application(args["name"]))
+    return _text(await _run(close_application, args["name"]))
 
 async def handle_open_url(args: dict) -> list[TextContent]:
     from src.windows import open_url
-    return _text(open_url(args["url"]))
+    return _text(await _run(open_url, args["url"]))
 
 async def handle_list_processes(args: dict) -> list[TextContent]:
     from src.windows import list_processes
-    return _text(list_processes(args.get("filter", "")))
+    return _text(await _run(list_processes, args.get("filter", "")))
 
 async def handle_kill_process(args: dict) -> list[TextContent]:
     from src.windows import kill_process
-    return _text(kill_process(args["name"]))
+    return _text(await _run(kill_process, args["name"]))
 
 async def handle_list_windows(args: dict) -> list[TextContent]:
     from src.windows import list_windows
-    return _text(list_windows())
+    return _text(await _run(list_windows))
 
 async def handle_focus_window(args: dict) -> list[TextContent]:
     from src.windows import focus_window
-    return _text(focus_window(args["title"]))
+    return _text(await _run(focus_window, args["title"]))
 
 async def handle_minimize_window(args: dict) -> list[TextContent]:
     from src.windows import minimize_window
-    return _text(minimize_window(args["title"]))
+    return _text(await _run(minimize_window, args["title"]))
 
 async def handle_maximize_window(args: dict) -> list[TextContent]:
     from src.windows import maximize_window
-    return _text(maximize_window(args["title"]))
+    return _text(await _run(maximize_window, args["title"]))
 
 async def handle_send_keys(args: dict) -> list[TextContent]:
     from src.windows import send_keys
-    return _text(send_keys(args["keys"]))
+    return _text(await _run(send_keys, args["keys"]))
 
 async def handle_type_text(args: dict) -> list[TextContent]:
     from src.windows import type_text
-    return _text(type_text(args["text"]))
+    return _text(await _run(type_text, args["text"]))
 
 async def handle_press_hotkey(args: dict) -> list[TextContent]:
     from src.windows import press_hotkey
-    return _text(press_hotkey(args["keys"]))
+    return _text(await _run(press_hotkey, args["keys"]))
 
 async def handle_mouse_click(args: dict) -> list[TextContent]:
     from src.windows import mouse_click
-    return _text(mouse_click(args.get("x", 0), args.get("y", 0), args.get("button", "left")))
+    return _text(await _run(mouse_click, args.get("x", 0), args.get("y", 0), args.get("button", "left")))
 
 async def handle_clipboard_get(args: dict) -> list[TextContent]:
     from src.windows import clipboard_get
-    return _text(clipboard_get())
+    return _text(await _run(clipboard_get))
 
 async def handle_clipboard_set(args: dict) -> list[TextContent]:
     from src.windows import clipboard_set
-    return _text(clipboard_set(args["text"]))
+    return _text(await _run(clipboard_set, args["text"]))
 
 async def handle_open_folder(args: dict) -> list[TextContent]:
     from src.windows import open_folder
-    return _text(open_folder(args["path"]))
+    return _text(await _run(open_folder, args["path"]))
 
 async def handle_list_folder(args: dict) -> list[TextContent]:
     from src.windows import list_folder
-    return _text(list_folder(args["path"]))
+    return _text(await _run(list_folder, args["path"]))
 
 async def handle_create_folder(args: dict) -> list[TextContent]:
     from src.windows import create_folder
-    return _text(create_folder(args["path"]))
+    return _text(await _run(create_folder, args["path"]))
 
 async def handle_copy_item(args: dict) -> list[TextContent]:
     from src.windows import copy_item
-    return _text(copy_item(args["source"], args["destination"]))
+    return _text(await _run(copy_item, args["source"], args["destination"]))
 
 async def handle_move_item(args: dict) -> list[TextContent]:
     from src.windows import move_item
-    return _text(move_item(args["source"], args["destination"]))
+    return _text(await _run(move_item, args["source"], args["destination"]))
 
 async def handle_delete_item(args: dict) -> list[TextContent]:
     from src.windows import delete_item
-    return _text(delete_item(args["path"]))
+    return _text(await _run(delete_item, args["path"]))
 
 async def handle_read_text_file(args: dict) -> list[TextContent]:
     from src.windows import read_file
-    return _text(read_file(args["path"]))
+    return _text(await _run(read_file, args["path"]))
 
 async def handle_write_text_file(args: dict) -> list[TextContent]:
     from src.windows import write_file
-    return _text(write_file(args["path"], args["content"]))
+    return _text(await _run(write_file, args["path"], args["content"]))
 
 async def handle_search_files(args: dict) -> list[TextContent]:
     from src.windows import search_files
-    return _text(search_files(args["path"], args["pattern"]))
+    return _text(await _run(search_files, args["path"], args["pattern"]))
 
 async def handle_volume_up(args: dict) -> list[TextContent]:
     from src.windows import volume_up
-    return _text(volume_up())
+    return _text(await _run(volume_up))
 
 async def handle_volume_down(args: dict) -> list[TextContent]:
     from src.windows import volume_down
-    return _text(volume_down())
+    return _text(await _run(volume_down))
 
 async def handle_volume_mute(args: dict) -> list[TextContent]:
     from src.windows import volume_mute
-    return _text(volume_mute())
+    return _text(await _run(volume_mute))
 
 async def handle_screenshot(args: dict) -> list[TextContent]:
     from src.windows import screenshot
-    return _text(screenshot(args.get("path", "")))
+    return _text(await _run(screenshot, args.get("path", "")))
 
 async def handle_screen_resolution(args: dict) -> list[TextContent]:
     from src.windows import get_screen_resolution
-    return _text(get_screen_resolution())
+    return _text(await _run(get_screen_resolution))
 
 async def handle_system_info(args: dict) -> list[TextContent]:
     from src.windows import get_system_info
-    return _text(get_system_info())
+    result = await _run(get_system_info)
+    return _text(json.dumps(result, ensure_ascii=False, indent=2) if isinstance(result, dict) else str(result))
 
 async def handle_gpu_info(args: dict) -> list[TextContent]:
     from src.windows import get_gpu_info
-    return _text(get_gpu_info())
+    return _text(await _run(get_gpu_info))
 
 async def handle_network_info(args: dict) -> list[TextContent]:
     from src.windows import get_network_info
-    return _text(get_network_info())
+    return _text(await _run(get_network_info))
 
 async def handle_powershell_run(args: dict) -> list[TextContent]:
-    return _text(_ps(args["command"]))
+    return _text(await _ps(args["command"]))
 
 async def handle_lock_screen(args: dict) -> list[TextContent]:
     from src.windows import lock_screen
-    return _text(lock_screen())
+    return _text(await _run(lock_screen))
 
 async def handle_shutdown_pc(args: dict) -> list[TextContent]:
     from src.windows import shutdown_pc
-    return _text(shutdown_pc(args.get("delay", 0)))
+    return _text(await _run(shutdown_pc, args.get("delay", 0)))
 
 async def handle_restart_pc(args: dict) -> list[TextContent]:
     from src.windows import restart_pc
-    return _text(restart_pc(args.get("delay", 0)))
+    return _text(await _run(restart_pc, args.get("delay", 0)))
 
 async def handle_sleep_pc(args: dict) -> list[TextContent]:
     from src.windows import sleep_pc
-    return _text(sleep_pc())
+    return _text(await _run(sleep_pc))
 
 async def handle_list_services(args: dict) -> list[TextContent]:
     from src.windows import list_services
-    return _text(list_services(args.get("filter", "")))
+    return _text(await _run(list_services, args.get("filter", "")))
 
 async def handle_start_service(args: dict) -> list[TextContent]:
     from src.windows import start_service
-    return _text(start_service(args["name"]))
+    return _text(await _run(start_service, args["name"]))
 
 async def handle_stop_service(args: dict) -> list[TextContent]:
     from src.windows import stop_service
-    return _text(stop_service(args["name"]))
+    return _text(await _run(stop_service, args["name"]))
 
 async def handle_wifi_networks(args: dict) -> list[TextContent]:
     from src.windows import get_wifi_networks
-    return _text(get_wifi_networks())
+    return _text(await _run(get_wifi_networks))
 
 async def handle_ping(args: dict) -> list[TextContent]:
     from src.windows import ping_host
-    return _text(ping_host(args["host"]))
+    return _text(await _run(ping_host, args["host"]))
 
 async def handle_get_ip(args: dict) -> list[TextContent]:
     from src.windows import get_ip_address
-    return _text(get_ip_address())
+    return _text(await _run(get_ip_address))
 
 async def handle_registry_read(args: dict) -> list[TextContent]:
     from src.windows import registry_get
-    return _text(registry_get(args["path"], args["name"]))
+    return _text(await _run(registry_get, args["path"], args["name"]))
 
 async def handle_registry_write(args: dict) -> list[TextContent]:
     from src.windows import registry_set
-    return _text(registry_set(args["path"], args["name"], args["value"]))
+    return _text(await _run(registry_set, args["path"], args["name"], args["value"]))
 
 async def handle_notify(args: dict) -> list[TextContent]:
     from src.windows import notify_windows
-    return _text(notify_windows(args["title"], args["message"]))
+    return _text(await _run(notify_windows, args["title"], args["message"]))
 
 async def handle_speak(args: dict) -> list[TextContent]:
-    _ps(f'Add-Type -AssemblyName System.Speech; $s = New-Object System.Speech.Synthesis.SpeechSynthesizer; $s.Speak("{args["text"]}")')
+    await _ps(f'Add-Type -AssemblyName System.Speech; $s = New-Object System.Speech.Synthesis.SpeechSynthesizer; $s.Speak("{args["text"]}")')
     return _text(f"Parle: {args['text']}")
 
 async def handle_scheduled_tasks(args: dict) -> list[TextContent]:
-    return _text(_ps("Get-ScheduledTask | Where-Object {$_.State -ne 'Disabled'} | Select-Object TaskName, State, TaskPath | Format-Table -AutoSize | Out-String"))
+    return _text(await _ps("Get-ScheduledTask | Where-Object {$_.State -ne 'Disabled'} | Select-Object TaskName, State, TaskPath | Format-Table -AutoSize | Out-String"))
 
 
 # ═══════════════════════════════════════════════════════════════════════════
