@@ -1091,6 +1091,8 @@ COMMANDS: list[JarvisCommand] = [
     JarvisCommand("planifier_arret", "systeme", "Planifier un arret dans X minutes", [
         "eteins dans {minutes} minutes", "arret dans {minutes} minutes",
         "programme l'arret dans {minutes}", "shutdown dans {minutes}",
+        "planifie un arret", "planifier un arret", "programmer un arret",
+        "planifie l'arret", "programme un arret automatique",
     ], "powershell", "shutdown /s /t ([int]'{minutes}' * 60); \"Arret programme dans {minutes} min\"", ["minutes"]),
     JarvisCommand("annuler_arret", "systeme", "Annuler un arret programme", [
         "annule l'arret", "annuler shutdown", "cancel shutdown",
@@ -1674,6 +1676,20 @@ VOICE_CORRECTIONS: dict[str, str] = {
     "etteint": "eteins",
     "redemarrre": "redemarre",
     "captur": "capture",
+    # Terminal / Spotify variantes STT
+    "terminale": "terminal",
+    "tairminale": "terminal",
+    "le terminale": "le terminal",
+    "spoti": "spotify",
+    "spotifie": "spotify",
+    "spotifai": "spotify",
+    "spottifaille": "spotify",
+    "spottifai": "spotify",
+    # Docker variantes STT
+    "dockeur": "docker",
+    "dokeur": "docker",
+    "dockers": "docker",
+    "dokeur ps": "docker ps",
     # Mots francais courants mal transcrits
     "processuce": "processus",
     "procaissus": "processus",

@@ -489,7 +489,8 @@ def _default_skills() -> list[Skill]:
             description="Ecran divise: navigateur a gauche, editeur a droite",
             triggers=[
                 "ecran divise", "split screen", "deux fenetres",
-                "moitie moitie", "cote a cote",
+                "moitie moitie", "cote a cote", "ecran de travail",
+                "espace de travail", "travail en split",
             ],
             steps=[
                 SkillStep("app_open", {"name": "chrome"}, "Ouvrir Chrome"),
