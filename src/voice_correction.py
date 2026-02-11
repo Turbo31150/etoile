@@ -141,6 +141,20 @@ IMPLICIT_COMMANDS: dict[str, str] = {
     "clavier": "parametres clavier",
     "comptes": "parametres comptes",
     "timeline": "historique activite",
+    # Vague 5 - Securite / DevTools / Maintenance
+    "antivirus": "ouvre la securite",
+    "defender": "ouvre la securite",
+    "firewall": "parametres pare-feu",
+    "defrag": "defragmente",
+    "hotspot": "active le hotspot",
+    "miracast": "partage l'ecran",
+    "pilotes": "gestionnaire de peripheriques",
+    "drivers": "gestionnaire de peripheriques",
+    "peripheriques": "gestionnaire de peripheriques",
+    "partitions": "gestionnaire de disques",
+    "autostart": "applications demarrage",
+    "confidentialite": "parametres confidentialite",
+    "desinstaller": "programmes installes",
 }
 
 

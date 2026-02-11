@@ -732,6 +732,80 @@ COMMANDS: list[JarvisCommand] = [
         "langue du systeme",
     ], "ms_settings", "ms-settings:regionlanguage"),
 
+    # ── Vague 5: Securite / DevTools / Partage / Maintenance avancee ──
+    JarvisCommand("windows_security", "systeme", "Ouvrir Windows Security", [
+        "ouvre la securite", "securite windows", "windows security",
+        "antivirus", "protection virus", "defender",
+    ], "app_open", "windowsdefender:"),
+    JarvisCommand("pare_feu", "systeme", "Parametres du pare-feu", [
+        "parametres pare-feu", "firewall", "ouvre le pare-feu",
+        "reglages pare-feu", "pare feu",
+    ], "ms_settings", "ms-settings:windowsdefender"),
+    JarvisCommand("partage_proximite", "systeme", "Parametres de partage a proximite", [
+        "partage a proximite", "nearby sharing", "partage rapide",
+        "envoyer a un appareil", "partage bluetooth",
+    ], "ms_settings", "ms-settings:crossdevice"),
+    JarvisCommand("hotspot", "systeme", "Activer le point d'acces mobile", [
+        "point d'acces", "hotspot", "partage de connexion",
+        "active le hotspot", "partage wifi",
+    ], "ms_settings", "ms-settings:network-mobilehotspot"),
+    JarvisCommand("defrag_disque", "systeme", "Optimiser les disques (defragmentation)", [
+        "defragmente", "optimise les disques", "defragmentation",
+        "defrag", "optimise le disque",
+    ], "powershell", "Start-Process dfrgui"),
+    JarvisCommand("gestion_disques", "systeme", "Ouvrir le gestionnaire de disques", [
+        "gestionnaire de disques", "gestion des disques", "disk manager",
+        "ouvre les disques", "partitions",
+    ], "powershell", "Start-Process diskmgmt.msc"),
+    JarvisCommand("variables_env", "systeme", "Ouvrir les variables d'environnement", [
+        "variables d'environnement", "variables env", "env variables",
+        "ouvre les variables", "path windows",
+    ], "powershell", "Start-Process rundll32.exe -ArgumentList 'sysdm.cpl,EditEnvironmentVariables'"),
+    JarvisCommand("evenements_windows", "systeme", "Ouvrir l'observateur d'evenements", [
+        "observateur d'evenements", "event viewer", "journaux windows",
+        "logs windows", "evenements systeme",
+    ], "powershell", "Start-Process eventvwr.msc"),
+    JarvisCommand("moniteur_ressources", "systeme", "Ouvrir le moniteur de ressources", [
+        "moniteur de ressources", "resource monitor", "ressources systeme",
+        "moniteur performances", "perfmon",
+    ], "powershell", "Start-Process resmon"),
+    JarvisCommand("info_systeme_detaille", "systeme", "Ouvrir les informations systeme detaillees", [
+        "informations systeme detaillees", "msinfo", "infos systeme avancees",
+        "specs du pc", "configuration detaillee",
+    ], "powershell", "Start-Process msinfo32"),
+    JarvisCommand("nettoyage_disque", "systeme", "Ouvrir le nettoyage de disque Windows", [
+        "nettoyage de disque", "disk cleanup", "nettoie le disque",
+        "clean disk", "libere de l'espace",
+    ], "powershell", "Start-Process cleanmgr"),
+    JarvisCommand("gestionnaire_peripheriques", "systeme", "Ouvrir le gestionnaire de peripheriques", [
+        "gestionnaire de peripheriques", "device manager",
+        "mes peripheriques", "drivers", "pilotes",
+    ], "powershell", "Start-Process devmgmt.msc"),
+    JarvisCommand("connexions_reseau", "systeme", "Ouvrir les connexions reseau", [
+        "connexions reseau", "adaptateurs reseau", "network connections",
+        "cartes reseau", "interfaces reseau",
+    ], "powershell", "Start-Process ncpa.cpl"),
+    JarvisCommand("programmes_installees", "systeme", "Ouvrir programmes et fonctionnalites", [
+        "programmes installes", "applications installees",
+        "liste des programmes", "desinstaller un programme",
+    ], "ms_settings", "ms-settings:appsfeatures"),
+    JarvisCommand("demarrage_apps", "systeme", "Gerer les applications au demarrage", [
+        "applications demarrage", "programmes au demarrage",
+        "gere le demarrage", "startup apps", "autostart",
+    ], "ms_settings", "ms-settings:startupapps"),
+    JarvisCommand("param_confidentialite", "systeme", "Parametres de confidentialite", [
+        "parametres confidentialite", "privacy", "confidentialite",
+        "vie privee", "reglages confidentialite",
+    ], "ms_settings", "ms-settings:privacy"),
+    JarvisCommand("param_reseau_avance", "systeme", "Parametres reseau avances", [
+        "parametres reseau avances", "reseau avance", "advanced network",
+        "config reseau avancee",
+    ], "ms_settings", "ms-settings:network-advancedsettings"),
+    JarvisCommand("partager_ecran", "systeme", "Partager l'ecran via Miracast", [
+        "partage l'ecran", "miracast", "cast", "diffuse l'ecran",
+        "envoie l'ecran", "screen cast",
+    ], "hotkey", "win+k"),
+
     # ══════════════════════════════════════════════════════════════════════
     # TRADING & IA (10 commandes)
     # ══════════════════════════════════════════════════════════════════════
@@ -1147,6 +1221,27 @@ VOICE_CORRECTIONS: dict[str, str] = {
     "battri": "batterie",
     "fuso": "fuseau",
     "horaire": "horaire",
+    # Vague 5 — Securite / DevTools
+    "antivirus": "antivirus",
+    "defandeur": "defender",
+    "defender": "defender",
+    "pare feu": "pare-feu",
+    "parefeu": "pare-feu",
+    "firewal": "firewall",
+    "firevol": "firewall",
+    "defragmantation": "defragmentation",
+    "defragmantassion": "defragmentation",
+    "hotspot": "hotspot",
+    "otspoute": "hotspot",
+    "hotespote": "hotspot",
+    "miracaste": "miracast",
+    "mirakast": "miracast",
+    "peripherike": "peripheriques",
+    "periferiue": "peripheriques",
+    "pilotte": "pilotes",
+    "driverr": "drivers",
+    "confidancialite": "confidentialite",
+    "confidentalite": "confidentialite",
     # Mode avion / Micro / Camera
     "mod avion": "mode avion",
     "mode avillion": "mode avion",

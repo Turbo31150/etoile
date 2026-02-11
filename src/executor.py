@@ -341,6 +341,8 @@ HOTKEY_MAP: dict[str, str] = {
     "ctrl+h": "(New-Object -ComObject WScript.Shell).SendKeys('^h')",
     "ctrl+d": "(New-Object -ComObject WScript.Shell).SendKeys('^d')",
     "ctrl+j": "(New-Object -ComObject WScript.Shell).SendKeys('^j')",
+    # Vague 5 — Miracast
+    "win+k": _win_hotkey_ps("K"),           # Connect / Miracast
 }
 
 

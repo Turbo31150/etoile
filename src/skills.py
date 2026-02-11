@@ -927,4 +927,70 @@ def _default_skills() -> list[Skill]:
             ],
             category="systeme",
         ),
+
+        # ── VAGUE 5: Pipelines securite / maintenance avancee ──
+
+        Skill(
+            name="audit_securite",
+            description="Audit securite: Windows Security + pare-feu + services + confidentialite",
+            triggers=[
+                "audit securite", "check securite", "verification securite",
+                "securite du pc", "scan securite",
+            ],
+            steps=[
+                SkillStep("app_open", {"name": "windowsdefender:"}, "Ouvrir Windows Security"),
+                SkillStep("list_services", {}, "Verifier les services"),
+                SkillStep("network_info", {}, "Check reseau"),
+                SkillStep("notify", {"title": "JARVIS", "message": "Audit securite termine."}, "Notification"),
+            ],
+            category="systeme",
+        ),
+        Skill(
+            name="maintenance_complete",
+            description="Maintenance complete: nettoyage disque + temp + defrag + check espace",
+            triggers=[
+                "maintenance complete", "entretien du pc", "maintenance pc",
+                "entretien complet", "soin du pc",
+            ],
+            steps=[
+                SkillStep("powershell_run", {"command": "Remove-Item $env:TEMP\\* -Recurse -Force -ErrorAction SilentlyContinue; 'Temp nettoye'"}, "Vider temp"),
+                SkillStep("powershell_run", {"command": "Clear-RecycleBin -Force -ErrorAction SilentlyContinue; 'Corbeille videe'"}, "Vider corbeille"),
+                SkillStep("powershell_run", {"command": "Get-CimInstance Win32_LogicalDisk | Select DeviceID, @{N='Free(GB)';E={[math]::Round($_.FreeSpace/1GB,1)}} | Out-String"}, "Espace disque"),
+                SkillStep("system_info", {}, "Diagnostic systeme"),
+                SkillStep("gpu_info", {}, "Check GPU"),
+                SkillStep("notify", {"title": "JARVIS", "message": "Maintenance complete terminee."}, "Notification"),
+            ],
+            category="systeme",
+            confirm=True,
+        ),
+        Skill(
+            name="mode_partage_ecran",
+            description="Mode partage ecran: Miracast + luminosite max + mode presentation",
+            triggers=[
+                "mode partage ecran", "partage d'ecran", "diffuse l'ecran",
+                "lance le cast", "envoie sur la tv",
+            ],
+            steps=[
+                SkillStep("press_hotkey", {"keys": "win+k"}, "Ouvrir Miracast"),
+                SkillStep("powershell_run", {"command": "$b = 100; (Get-CimInstance -Namespace root/WMI -ClassName WmiMonitorBrightnessMethods).WmiSetBrightness(1, $b)"}, "Luminosite max"),
+                SkillStep("notify", {"title": "JARVIS", "message": "Mode partage ecran actif."}, "Notification"),
+            ],
+            category="productivite",
+        ),
+        Skill(
+            name="diagnostic_demarrage",
+            description="Diagnostic demarrage: apps au demarrage + services + utilisation disque",
+            triggers=[
+                "diagnostic demarrage", "le pc demarre lentement",
+                "demarrage lent", "optimise le demarrage", "pourquoi c'est lent",
+            ],
+            steps=[
+                SkillStep("powershell_run", {"command": "Get-CimInstance Win32_StartupCommand | Select Name, Command | Out-String"}, "Apps au demarrage"),
+                SkillStep("list_services", {}, "Services actifs"),
+                SkillStep("system_info", {}, "Diagnostic systeme"),
+                SkillStep("powershell_run", {"command": "Get-CimInstance Win32_LogicalDisk | Select DeviceID, @{N='Free(GB)';E={[math]::Round($_.FreeSpace/1GB,1)}} | Out-String"}, "Espace disque"),
+                SkillStep("notify", {"title": "JARVIS", "message": "Diagnostic demarrage termine."}, "Notification"),
+            ],
+            category="systeme",
+        ),
     ]
