@@ -18,7 +18,6 @@ from claude_agent_sdk import (
 
 from src.config import config, JARVIS_VERSION
 from src.agents import JARVIS_AGENTS
-from src.tools import jarvis_server
 from src.output import JARVIS_OUTPUT_SCHEMA
 
 
@@ -129,6 +128,19 @@ async def log_tool_use(
     return {}
 
 
+def _jarvis_mcp_config() -> dict:
+    """Build MCP stdio server config for JARVIS tools."""
+    import sys
+    from pathlib import Path
+    server_script = str(Path(__file__).resolve().parent / "mcp_server.py")
+    return {
+        "type": "stdio",
+        "command": sys.executable,
+        "args": [server_script],
+        "env": {},
+    }
+
+
 def build_options(cwd: str | None = None) -> ClaudeAgentOptions:
     """Build ClaudeAgentOptions for the JARVIS orchestrator."""
     return ClaudeAgentOptions(
@@ -141,32 +153,37 @@ def build_options(cwd: str | None = None) -> ClaudeAgentOptions:
             # JARVIS MCP — all 52 tools authorized
             "mcp__jarvis__*",
         ],
-        mcp_servers={"jarvis": jarvis_server},
+        mcp_servers={"jarvis": _jarvis_mcp_config()},
         agents=JARVIS_AGENTS,
-        hooks={
-            "PostToolUse": [HookMatcher(hooks=[log_tool_use])],
-        },
         cwd=cwd,
     )
 
 
 async def run_once(prompt: str, cwd: str | None = None) -> str | None:
     """Single-shot query: send prompt, collect full result."""
-    options = build_options(cwd)
+    options = build_options(cwd or "F:/BUREAU/turbo")
 
     from claude_agent_sdk import query
 
     result_text: str | None = None
-    async for message in query(prompt=prompt, options=options):
-        if isinstance(message, AssistantMessage):
-            for block in message.content:
-                if isinstance(block, TextBlock):
-                    print(block.text, end="", flush=True)
-        if isinstance(message, ResultMessage):
-            result_text = message.result
-            print(f"\n  [JARVIS] Cost: ${message.total_cost_usd or 0:.4f} | "
-                  f"Turns: {message.num_turns} | "
-                  f"Duration: {message.duration_ms}ms")
+    try:
+        async for message in query(prompt=prompt, options=options):
+            if isinstance(message, AssistantMessage):
+                for block in message.content:
+                    if isinstance(block, TextBlock):
+                        print(block.text, end="", flush=True)
+            if isinstance(message, ResultMessage):
+                result_text = message.result
+                print(f"\n  [JARVIS] Cost: ${message.total_cost_usd or 0:.4f} | "
+                      f"Turns: {message.num_turns} | "
+                      f"Duration: {message.duration_ms}ms")
+    except ExceptionGroup as eg:
+        # SDK transport cleanup errors — non-fatal
+        for exc in eg.exceptions:
+            if "ProcessTransport" in str(exc):
+                pass  # Ignore transport close errors
+            else:
+                raise
     return result_text
 
 

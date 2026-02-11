@@ -3,7 +3,15 @@
 from __future__ import annotations
 
 import asyncio
+import io
+import os
 import sys
+
+# Force UTF-8 output on Windows to avoid cp1252 emoji crashes
+if sys.platform == "win32":
+    sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding="utf-8", errors="replace")
+    sys.stderr = io.TextIOWrapper(sys.stderr.buffer, encoding="utf-8", errors="replace")
+    os.environ.setdefault("PYTHONIOENCODING", "utf-8")
 
 from src.orchestrator import run_once, run_interactive, run_voice
 
