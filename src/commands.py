@@ -806,6 +806,72 @@ COMMANDS: list[JarvisCommand] = [
         "envoie l'ecran", "screen cast",
     ], "hotkey", "win+k"),
 
+    # ── Vague 6: Personnalisation / Audio / Imprimantes / Outils avances ──
+    JarvisCommand("param_imprimantes", "systeme", "Parametres imprimantes et scanners", [
+        "parametres imprimantes", "imprimante", "ouvre les imprimantes",
+        "scanners", "gere les imprimantes",
+    ], "ms_settings", "ms-settings:printers"),
+    JarvisCommand("param_fond_ecran", "systeme", "Personnaliser le fond d'ecran", [
+        "fond d'ecran", "change le fond", "wallpaper",
+        "arriere plan", "personnalise le bureau",
+    ], "ms_settings", "ms-settings:personalization-background"),
+    JarvisCommand("param_couleurs", "systeme", "Personnaliser les couleurs Windows", [
+        "couleurs windows", "couleur d'accent", "theme couleur",
+        "mode sombre", "mode clair", "dark mode", "light mode",
+    ], "ms_settings", "ms-settings:personalization-colors"),
+    JarvisCommand("param_ecran_veille", "systeme", "Parametres ecran de verrouillage", [
+        "ecran de veille", "ecran de verrouillage", "lock screen",
+        "personnalise l'ecran de veille",
+    ], "ms_settings", "ms-settings:lockscreen"),
+    JarvisCommand("param_polices", "systeme", "Gerer les polices installees", [
+        "polices", "fonts", "gere les polices",
+        "polices installees", "typographies",
+    ], "ms_settings", "ms-settings:fonts"),
+    JarvisCommand("param_themes", "systeme", "Gerer les themes Windows", [
+        "themes windows", "change le theme", "personnalise le theme",
+        "themes", "apparence windows",
+    ], "ms_settings", "ms-settings:themes"),
+    JarvisCommand("mode_sombre", "systeme", "Activer le mode sombre Windows", [
+        "active le mode sombre", "dark mode on", "theme sombre",
+        "passe en sombre", "mode fonce",
+    ], "powershell", "Set-ItemProperty -Path 'HKCU:\\Software\\Microsoft\\Windows\\CurrentVersion\\Themes\\Personalize' -Name 'AppsUseLightTheme' -Value 0; Set-ItemProperty -Path 'HKCU:\\Software\\Microsoft\\Windows\\CurrentVersion\\Themes\\Personalize' -Name 'SystemUsesLightTheme' -Value 0; 'Mode sombre active'"),
+    JarvisCommand("mode_clair", "systeme", "Activer le mode clair Windows", [
+        "active le mode clair", "light mode on", "theme clair",
+        "passe en clair", "mode lumineux",
+    ], "powershell", "Set-ItemProperty -Path 'HKCU:\\Software\\Microsoft\\Windows\\CurrentVersion\\Themes\\Personalize' -Name 'AppsUseLightTheme' -Value 1; Set-ItemProperty -Path 'HKCU:\\Software\\Microsoft\\Windows\\CurrentVersion\\Themes\\Personalize' -Name 'SystemUsesLightTheme' -Value 1; 'Mode clair active'"),
+    JarvisCommand("param_son_avance", "systeme", "Parametres audio avances", [
+        "parametres audio avances", "son avance", "mixer audio",
+        "gere les sorties audio", "peripheriques audio",
+    ], "ms_settings", "ms-settings:sound-advancedoptions" if False else "ms-settings:sound"),
+    JarvisCommand("param_hdr", "systeme", "Parametres HDR", [
+        "parametres hdr", "active le hdr", "hdr",
+        "mode hdr", "high dynamic range",
+    ], "ms_settings", "ms-settings:display-advancedgraphics"),
+    JarvisCommand("ouvrir_regedit", "systeme", "Ouvrir l'editeur de registre", [
+        "ouvre le registre", "regedit", "editeur de registre",
+        "registre windows",
+    ], "powershell", "Start-Process regedit", confirm=True),
+    JarvisCommand("ouvrir_mmc", "systeme", "Ouvrir la console de gestion (MMC)", [
+        "console de gestion", "mmc", "ouvre mmc",
+        "gestion de l'ordinateur",
+    ], "powershell", "Start-Process compmgmt.msc"),
+    JarvisCommand("ouvrir_politique_groupe", "systeme", "Ouvrir l'editeur de strategie de groupe", [
+        "politique de groupe", "group policy", "gpedit",
+        "strategie de groupe", "ouvre gpedit",
+    ], "powershell", "Start-Process gpedit.msc"),
+    JarvisCommand("taux_rafraichissement", "systeme", "Parametres taux de rafraichissement ecran", [
+        "taux de rafraichissement", "hertz ecran", "frequence ecran",
+        "combien de hertz", "refresh rate",
+    ], "ms_settings", "ms-settings:display-advancedgraphics"),
+    JarvisCommand("param_notifications_avance", "systeme", "Parametres notifications avances", [
+        "parametres notifications avances", "gere les notifications",
+        "quelles apps notifient", "notifications par app",
+    ], "ms_settings", "ms-settings:notifications"),
+    JarvisCommand("param_multitache", "systeme", "Parametres multitache Windows", [
+        "parametres multitache", "multitasking", "reglages multitache",
+        "snap assist", "bureaux virtuels reglages",
+    ], "ms_settings", "ms-settings:multitasking"),
+
     # ══════════════════════════════════════════════════════════════════════
     # TRADING & IA (10 commandes)
     # ══════════════════════════════════════════════════════════════════════
@@ -1242,6 +1308,22 @@ VOICE_CORRECTIONS: dict[str, str] = {
     "driverr": "drivers",
     "confidancialite": "confidentialite",
     "confidentalite": "confidentialite",
+    # Vague 6 — Personnalisation
+    "walpepper": "wallpaper",
+    "walpaper": "wallpaper",
+    "fon d'ecran": "fond d'ecran",
+    "fond decran": "fond d'ecran",
+    "polisse": "polices",
+    "fonte": "fonts",
+    "imprimentes": "imprimantes",
+    "imprimante": "imprimante",
+    "regedte": "regedit",
+    "rejedi": "regedit",
+    "multitasking": "multitache",
+    "hdaire": "hdr",
+    "dark mods": "dark mode",
+    "light mods": "light mode",
+    "theme somb": "theme sombre",
     # Mode avion / Micro / Camera
     "mod avion": "mode avion",
     "mode avillion": "mode avion",

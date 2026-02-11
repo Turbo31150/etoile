@@ -993,4 +993,38 @@ def _default_skills() -> list[Skill]:
             ],
             category="systeme",
         ),
+
+        # ── VAGUE 6: Pipelines personnalisation / ambiance ──
+
+        Skill(
+            name="mode_nuit_complet",
+            description="Mode nuit complet: mode sombre + night light + luminosite basse + volume bas",
+            triggers=[
+                "mode nuit complet", "ambiance nuit", "tout en sombre",
+                "active tout le mode nuit", "nuit totale",
+            ],
+            steps=[
+                SkillStep("powershell_run", {"command": "Set-ItemProperty -Path 'HKCU:\\Software\\Microsoft\\Windows\\CurrentVersion\\Themes\\Personalize' -Name 'AppsUseLightTheme' -Value 0; Set-ItemProperty -Path 'HKCU:\\Software\\Microsoft\\Windows\\CurrentVersion\\Themes\\Personalize' -Name 'SystemUsesLightTheme' -Value 0; 'Mode sombre active'"}, "Mode sombre"),
+                SkillStep("powershell_run", {"command": "$b = 20; (Get-CimInstance -Namespace root/WMI -ClassName WmiMonitorBrightnessMethods).WmiSetBrightness(1, $b)"}, "Luminosite basse"),
+                SkillStep("volume_down", {}, "Volume bas"),
+                SkillStep("volume_down", {}, "Volume minimal"),
+                SkillStep("notify", {"title": "JARVIS", "message": "Mode nuit complet actif."}, "Notification"),
+            ],
+            category="productivite",
+        ),
+        Skill(
+            name="mode_jour",
+            description="Mode jour: mode clair + luminosite max + night light off",
+            triggers=[
+                "mode jour", "mode journee", "tout en clair",
+                "ambiance jour", "reveil",
+            ],
+            steps=[
+                SkillStep("powershell_run", {"command": "Set-ItemProperty -Path 'HKCU:\\Software\\Microsoft\\Windows\\CurrentVersion\\Themes\\Personalize' -Name 'AppsUseLightTheme' -Value 1; Set-ItemProperty -Path 'HKCU:\\Software\\Microsoft\\Windows\\CurrentVersion\\Themes\\Personalize' -Name 'SystemUsesLightTheme' -Value 1; 'Mode clair active'"}, "Mode clair"),
+                SkillStep("powershell_run", {"command": "$b = 80; (Get-CimInstance -Namespace root/WMI -ClassName WmiMonitorBrightnessMethods).WmiSetBrightness(1, $b)"}, "Luminosite haute"),
+                SkillStep("volume_up", {}, "Volume normal"),
+                SkillStep("notify", {"title": "JARVIS", "message": "Mode jour actif. Bonne journee."}, "Notification"),
+            ],
+            category="productivite",
+        ),
     ]

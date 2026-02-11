@@ -155,6 +155,16 @@ IMPLICIT_COMMANDS: dict[str, str] = {
     "autostart": "applications demarrage",
     "confidentialite": "parametres confidentialite",
     "desinstaller": "programmes installes",
+    # Vague 6 - Personnalisation / Audio
+    "imprimante": "parametres imprimantes",
+    "wallpaper": "fond d'ecran",
+    "polices": "polices",
+    "themes": "themes windows",
+    "sombre": "active le mode sombre",
+    "clair": "active le mode clair",
+    "regedit": "ouvre le registre",
+    "hdr": "parametres hdr",
+    "multitache": "parametres multitache",
 }
 
 
