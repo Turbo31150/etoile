@@ -85,13 +85,13 @@ class JarvisConfig:
         LMStudioNode(
             "M1", os.getenv("LM_STUDIO_1_URL", "http://localhost:1234"),
             "deep_analysis", gpus=5, vram_gb=43,
-            default_model="qwen3-30b-a3b-instruct-2507", weight=1.3,
+            default_model="qwen/qwen3-30b-a3b-2507", weight=1.3,
             use_cases=["Analyse technique", "Elliott waves", "Patterns complexes"],
         ),
         LMStudioNode(
             "M2", os.getenv("LM_STUDIO_2_URL", "http://192.168.1.26:1234"),
             "fast_inference", gpus=3, vram_gb=24,
-            default_model="nvidia/nemotron-3-nano", weight=1.0,
+            default_model="openai/gpt-oss-20b", weight=1.0,
             use_cases=["Trading signals", "Quick responses", "Code generation"],
         ),
         LMStudioNode(
@@ -139,6 +139,20 @@ class JarvisConfig:
     leverage: int = 10
     tp_percent: float = 0.4
     sl_percent: float = 0.25
+
+    # ── Execution pipeline ────────────────────────────────────────────────
+    mexc_api_key: str = field(default_factory=lambda: os.getenv("MEXC_API_KEY", ""))
+    mexc_secret_key: str = field(default_factory=lambda: os.getenv("MEXC_SECRET_KEY", ""))
+    telegram_token: str = field(default_factory=lambda: os.getenv("TELEGRAM_TOKEN", ""))
+    telegram_chat: str = field(default_factory=lambda: os.getenv("TELEGRAM_CHAT", ""))
+    dry_run: bool = field(default_factory=lambda: os.getenv("DRY_RUN", "true").lower() == "true")
+    size_usdt: float = 10.0
+    min_signal_score: float = 70.0
+    max_signal_age_minutes: int = 60
+
+    # ── DB paths ──────────────────────────────────────────────────────────
+    db_trading: Path = field(default_factory=lambda: PATHS["carV1"] / "database/trading_latest.db")
+    db_predictions: Path = field(default_factory=lambda: PATHS["trading_v2"] / "database/trading.db")
 
     # Generation params
     temperature: float = 0.7
