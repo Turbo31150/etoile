@@ -1,0 +1,13 @@
+[project]
+name = "turbo"
+version = "0.1.0"
+description = "JARVIS Orchestrator - Multi-engine AI agent powered by Claude Agent SDK"
+requires-python = ">=3.10"
+dependencies = [
+    "claude-agent-sdk>=0.1.35",
+    "httpx>=0.27.0",
+    "python-dotenv>=1.0.0",
+]
+
+[project.scripts]
+turbo = "main:main_sync"

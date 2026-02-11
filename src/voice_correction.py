@@ -1,0 +1,439 @@
+"""JARVIS Voice Correction — Intelligent correction despite capture errors.
+
+Pipeline: Raw STT → Nettoyage → Corrections locales → Phonetique →
+          Fuzzy match → Suggestions → Correction IA → Execution
+"""
+
+from __future__ import annotations
+
+import re
+import unicodedata
+from difflib import SequenceMatcher, get_close_matches
+from typing import Any
+
+from src.commands import (
+    COMMANDS, JarvisCommand, VOICE_CORRECTIONS,
+    APP_PATHS, SITE_ALIASES, correct_voice_text,
+)
+
+
+# ═══════════════════════════════════════════════════════════════════════════
+# PHONETIC MAP — Sons francais similaires (Whisper confond souvent)
+# ═══════════════════════════════════════════════════════════════════════════
+
+# Groupes de sons qui se confondent en francais
+PHONETIC_GROUPS: list[list[str]] = [
+    ["ai", "e", "est", "et", "es", "ait", "ais"],
+    ["au", "o", "eau", "haut", "oh"],
+    ["an", "en", "ant", "ent", "amp", "emps"],
+    ["on", "ont", "om"],
+    ["in", "ain", "ein", "im"],
+    ["ou", "oo", "oux"],
+    ["eu", "oeu", "eux"],
+    ["oi", "oie", "wa"],
+    ["ch", "sh"],
+    ["g", "j", "ge"],
+    ["k", "c", "qu", "q"],
+    ["s", "ss", "c", "ce"],
+    ["z", "s"],
+    ["f", "ph"],
+    ["t", "th"],
+]
+
+# Mots-outils souvent rajoutes/enleves par le STT
+FILLER_WORDS = {
+    "euh", "hum", "hmm", "bah", "ben", "bon", "alors",
+    "donc", "voila", "ok", "well", "so", "please",
+    "s'il te plait", "s'il vous plait", "merci",
+    "un peu", "juste", "peut-etre", "genre",
+    "tu peux", "est-ce que tu peux", "peux-tu",
+    "je veux", "je voudrais", "j'aimerais",
+    "est-ce que", "est ce que",
+}
+
+# Expansions de commandes implicites
+IMPLICIT_COMMANDS: dict[str, str] = {
+    "google": "cherche sur google",
+    "youtube": "ouvre youtube",
+    "gmail": "ouvre gmail",
+    "chrome": "ouvre chrome",
+    "comet": "ouvre comet",
+    "terminal": "ouvre le terminal",
+    "vscode": "ouvre vscode",
+    "documents": "ouvre mes documents",
+    "telechargements": "ouvre les telechargements",
+    "bureau": "ouvre le bureau",
+    "volume": "monte le volume",
+    "mute": "coupe le son",
+    "silence": "coupe le son",
+    "screenshot": "capture ecran",
+    "capture": "capture ecran",
+    "scanner": "scanne le marche",
+    "breakout": "detecte les breakouts",
+    "pipeline": "lance le pipeline",
+    "cluster": "statut du cluster",
+    "aide": "aide",
+    "stop": "stop",
+    "status": "statut du cluster",
+}
+
+
+# ═══════════════════════════════════════════════════════════════════════════
+# TEXT CLEANING
+# ═══════════════════════════════════════════════════════════════════════════
+
+def normalize_text(text: str) -> str:
+    """Normalize text: lowercase, remove accents, clean punctuation."""
+    text = text.lower().strip()
+    # Remove common punctuation
+    text = re.sub(r"[.,!?;:\"'()\[\]{}<>]", "", text)
+    # Collapse multiple spaces
+    text = re.sub(r"\s+", " ", text)
+    return text.strip()
+
+
+def remove_accents(text: str) -> str:
+    """Remove accents from text for fuzzy comparison."""
+    nfkd = unicodedata.normalize("NFKD", text)
+    return "".join(c for c in nfkd if not unicodedata.combining(c))
+
+
+def remove_fillers(text: str) -> str:
+    """Remove filler words and politeness from voice input."""
+    words = text.split()
+    cleaned = []
+    skip_next = False
+    for i, word in enumerate(words):
+        if skip_next:
+            skip_next = False
+            continue
+        # Check single word fillers
+        if word in FILLER_WORDS:
+            continue
+        # Check two-word fillers
+        if i < len(words) - 1:
+            pair = f"{word} {words[i+1]}"
+            if pair in FILLER_WORDS:
+                skip_next = True
+                continue
+        cleaned.append(word)
+    return " ".join(cleaned)
+
+
+def extract_action_intent(text: str) -> str:
+    """Extract the core action intent from verbose voice input.
+
+    "est-ce que tu peux ouvrir chrome s'il te plait" → "ouvrir chrome"
+    "j'aimerais que tu cherches bitcoin sur google" → "cherche bitcoin sur google"
+    """
+    text = remove_fillers(text)
+
+    # Remove leading "que tu" / "de"
+    text = re.sub(r"^que tu\s+", "", text)
+    text = re.sub(r"^de\s+", "", text)
+
+    # Normalize verb forms → imperative
+    replacements = [
+        (r"\bouvrir\b", "ouvre"),
+        (r"\blancer\b", "lance"),
+        (r"\bchercher\b", "cherche"),
+        (r"\brechercher\b", "recherche"),
+        (r"\bnaviguer\b", "navigue"),
+        (r"\bfermer\b", "ferme"),
+        (r"\bmettre\b", "mets"),
+        (r"\baugmenter\b", "augmente"),
+        (r"\bbaisser\b", "baisse"),
+        (r"\bcouper\b", "coupe"),
+        (r"\bverrouiller\b", "verrouille"),
+        (r"\beteindre\b", "eteins"),
+        (r"\bredemarrer\b", "redemarre"),
+        (r"\bscanner\b", "scanne"),
+        (r"\bdetecter\b", "detecte"),
+        (r"\bafficher\b", "affiche"),
+        (r"\bmonter\b", "monte"),
+    ]
+    for pattern, replacement in replacements:
+        text = re.sub(pattern, replacement, text)
+
+    return text.strip()
+
+
+# ═══════════════════════════════════════════════════════════════════════════
+# PHONETIC SIMILARITY
+# ═══════════════════════════════════════════════════════════════════════════
+
+def phonetic_normalize(word: str) -> str:
+    """Reduce a French word to its phonetic skeleton."""
+    word = remove_accents(word.lower())
+
+    # Apply phonetic reductions
+    reductions = [
+        (r"eau", "o"), (r"au", "o"), (r"ai", "e"), (r"ei", "e"),
+        (r"ou", "u"), (r"ph", "f"), (r"th", "t"), (r"ch", "sh"),
+        (r"qu", "k"), (r"gu", "g"), (r"gn", "n"),
+        (r"tion", "sion"), (r"ce", "se"), (r"ci", "si"),
+        (r"ge", "je"), (r"gi", "ji"),
+        # Double consonants → single
+        (r"(.)\1+", r"\1"),
+        # Silent endings
+        (r"[esxzt]$", ""),
+    ]
+    for pattern, replacement in reductions:
+        word = re.sub(pattern, replacement, word)
+
+    return word
+
+
+def phonetic_similarity(a: str, b: str) -> float:
+    """Compare two strings phonetically."""
+    pa = phonetic_normalize(a)
+    pb = phonetic_normalize(b)
+    return SequenceMatcher(None, pa, pb).ratio()
+
+
+# ═══════════════════════════════════════════════════════════════════════════
+# SUGGESTION ENGINE
+# ═══════════════════════════════════════════════════════════════════════════
+
+def get_suggestions(text: str, max_results: int = 3) -> list[tuple[JarvisCommand, float]]:
+    """Get command suggestions ranked by combined similarity score.
+
+    Uses: text similarity + phonetic similarity + keyword overlap.
+    """
+    text_normalized = normalize_text(text)
+    text_no_accents = remove_accents(text_normalized)
+    text_words = set(text_normalized.split())
+
+    scored: list[tuple[JarvisCommand, float]] = []
+
+    for cmd in COMMANDS:
+        best_score = 0.0
+
+        for trigger in cmd.triggers:
+            trigger_clean = normalize_text(trigger.replace("{", "").replace("}", ""))
+            trigger_no_accents = remove_accents(trigger_clean)
+            trigger_words = set(trigger_clean.split())
+
+            # 1. Direct text similarity (40%)
+            text_sim = SequenceMatcher(None, text_no_accents, trigger_no_accents).ratio()
+
+            # 2. Phonetic similarity (30%)
+            phon_sim = phonetic_similarity(text_normalized, trigger_clean)
+
+            # 3. Keyword overlap (30%)
+            if trigger_words:
+                common = text_words & trigger_words
+                keyword_sim = len(common) / len(trigger_words)
+            else:
+                keyword_sim = 0.0
+
+            # Combined score
+            score = (text_sim * 0.4) + (phon_sim * 0.3) + (keyword_sim * 0.3)
+            best_score = max(best_score, score)
+
+        if best_score > 0.30:
+            scored.append((cmd, best_score))
+
+    scored.sort(key=lambda x: x[1], reverse=True)
+    return scored[:max_results]
+
+
+def format_suggestions(suggestions: list[tuple[JarvisCommand, float]]) -> str:
+    """Format suggestions for voice output."""
+    if not suggestions:
+        return "Je n'ai pas compris. Dis 'aide' pour la liste des commandes."
+
+    lines = ["Tu voulais dire:"]
+    for i, (cmd, score) in enumerate(suggestions, 1):
+        trigger = cmd.triggers[0]
+        lines.append(f"  {i}. {trigger} ({cmd.description})")
+    lines.append("Repete la commande ou dis le numero.")
+    return "\n".join(lines)
+
+
+# ═══════════════════════════════════════════════════════════════════════════
+# FULL CORRECTION PIPELINE
+# ═══════════════════════════════════════════════════════════════════════════
+
+async def full_correction_pipeline(
+    raw_text: str,
+    use_ia: bool = True,
+    ia_url: str = "http://localhost:1234",
+    ia_model: str = "nvidia/nemotron-3-nano",
+) -> dict[str, Any]:
+    """Complete voice correction pipeline.
+
+    Returns dict with:
+    - raw: original text
+    - cleaned: after local cleaning
+    - corrected: after all corrections
+    - intent: extracted action intent
+    - command: matched JarvisCommand or None
+    - params: extracted parameters
+    - confidence: match confidence (0-1)
+    - suggestions: alternative commands if low confidence
+    - method: how the match was found
+    """
+    result: dict[str, Any] = {
+        "raw": raw_text,
+        "cleaned": "",
+        "corrected": "",
+        "intent": "",
+        "command": None,
+        "params": {},
+        "confidence": 0.0,
+        "suggestions": [],
+        "method": "none",
+    }
+
+    # Step 1: Basic normalization
+    cleaned = normalize_text(raw_text)
+    result["cleaned"] = cleaned
+
+    # Step 2: Check implicit single-word commands
+    single = cleaned.strip()
+    if single in IMPLICIT_COMMANDS:
+        cleaned = IMPLICIT_COMMANDS[single]
+        result["method"] = "implicit"
+
+    # Step 3: Apply local voice corrections dictionary
+    corrected = correct_voice_text(cleaned)
+    result["corrected"] = corrected
+
+    # Step 4: Extract action intent (remove fillers, normalize verbs)
+    intent = extract_action_intent(corrected)
+    result["intent"] = intent
+
+    # Step 5: Try exact/fuzzy match with commands
+    from src.commands import match_command
+    cmd, params, score = match_command(intent)
+
+    if cmd and score >= 0.70:
+        result["command"] = cmd
+        result["params"] = params
+        result["confidence"] = score
+        result["method"] = result.get("method", "") or "direct"
+        return result
+
+    # Step 6: Try phonetic matching
+    best_phon_cmd = None
+    best_phon_score = 0.0
+    for c in COMMANDS:
+        for trigger in c.triggers:
+            clean_trigger = normalize_text(trigger.replace("{", "").replace("}", ""))
+            ps = phonetic_similarity(intent, clean_trigger)
+            if ps > best_phon_score:
+                best_phon_score = ps
+                best_phon_cmd = c
+
+    if best_phon_cmd and best_phon_score >= 0.70:
+        result["command"] = best_phon_cmd
+        result["params"] = {}
+        result["confidence"] = best_phon_score
+        result["method"] = "phonetic"
+        return result
+
+    # Step 7: IA correction (if enabled and text is complex enough)
+    if use_ia and len(intent.split()) >= 2:
+        try:
+            ia_corrected = await _ia_correct(intent, ia_url, ia_model)
+            if ia_corrected and ia_corrected != intent:
+                result["corrected"] = ia_corrected
+                # Re-try matching with IA-corrected text
+                cmd2, params2, score2 = match_command(ia_corrected)
+                if cmd2 and score2 >= 0.60:
+                    result["command"] = cmd2
+                    result["params"] = params2
+                    result["confidence"] = score2
+                    result["method"] = "ia_correction"
+                    return result
+        except Exception:
+            pass
+
+    # Step 8: If still no match, get suggestions
+    suggestions = get_suggestions(intent)
+    result["suggestions"] = suggestions
+
+    # If top suggestion is strong enough, use it
+    if suggestions and suggestions[0][1] >= 0.55:
+        top_cmd, top_score = suggestions[0]
+        result["command"] = top_cmd
+        result["confidence"] = top_score
+        result["method"] = "suggestion"
+        return result
+
+    # No match — will be sent to Claude as freeform
+    result["confidence"] = max(score, best_phon_score)
+    result["method"] = "freeform"
+    return result
+
+
+async def _ia_correct(text: str, url: str, model: str) -> str:
+    """Use local LM Studio to correct voice transcription."""
+    import httpx
+    prompt = (
+        "Corrige cette transcription vocale francaise. "
+        "Garde le sens original. Reponds UNIQUEMENT avec le texte corrige.\n\n"
+        f"Texte: {text}"
+    )
+    try:
+        async with httpx.AsyncClient(timeout=8) as c:
+            r = await c.post(
+                f"{url}/v1/chat/completions",
+                json={
+                    "model": model,
+                    "messages": [{"role": "user", "content": prompt}],
+                    "temperature": 0.1,
+                    "max_tokens": 200,
+                },
+            )
+            r.raise_for_status()
+            return r.json()["choices"][0]["message"]["content"].strip()
+    except Exception:
+        return text
+
+
+# ═══════════════════════════════════════════════════════════════════════════
+# VOICE SESSION STATE — Track conversation context
+# ═══════════════════════════════════════════════════════════════════════════
+
+class VoiceSession:
+    """Track voice session state for multi-turn correction."""
+
+    def __init__(self):
+        self.last_suggestions: list[tuple[JarvisCommand, float]] = []
+        self.last_raw: str = ""
+        self.correction_count: int = 0
+        self.history: list[str] = []
+
+    def is_selecting_suggestion(self, text: str) -> JarvisCommand | None:
+        """Check if user is selecting from previous suggestions by number."""
+        text = text.strip()
+        if text in ("1", "un", "premier", "premiere", "la premiere", "le premier"):
+            idx = 0
+        elif text in ("2", "deux", "deuxieme", "la deuxieme", "le deuxieme"):
+            idx = 1
+        elif text in ("3", "trois", "troisieme", "la troisieme", "le troisieme"):
+            idx = 2
+        else:
+            return None
+
+        if idx < len(self.last_suggestions):
+            return self.last_suggestions[idx][0]
+        return None
+
+    def is_confirmation(self, text: str) -> bool:
+        """Check if user is confirming."""
+        confirms = {"oui", "yes", "ok", "confirme", "valide", "go", "lance", "d'accord", "daccord", "ouais", "yep", "correct", "exactement", "c'est ca"}
+        return text.strip().lower() in confirms
+
+    def is_denial(self, text: str) -> bool:
+        """Check if user is denying/canceling."""
+        denials = {"non", "no", "annule", "annuler", "pas ca", "non merci", "nan", "nope", "stop", "arrete"}
+        return text.strip().lower() in denials
+
+    def add_to_history(self, text: str):
+        """Add corrected text to history for context."""
+        self.history.append(text)
+        if len(self.history) > 10:
+            self.history.pop(0)
