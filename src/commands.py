@@ -1683,6 +1683,108 @@ COMMANDS: list[JarvisCommand] = [
         "recherche windows", "windows search", "ouvre la recherche",
         "cherche dans windows",
     ], "hotkey", "win+s"),
+
+    # ══════════════════════════════════════════════════════════════════════
+    # VAGUE 17 — WSL, Hyper-V, Terminal, Diagnostics, Securite avancee (25)
+    # ══════════════════════════════════════════════════════════════════════
+    JarvisCommand("wsl_lancer", "dev", "Lancer WSL (Windows Subsystem for Linux)", [
+        "lance wsl", "ouvre wsl", "lance linux", "ouvre linux",
+        "demarre wsl", "wsl",
+    ], "powershell", "wsl"),
+    JarvisCommand("wsl_liste", "dev", "Lister les distributions WSL installees", [
+        "liste les distributions wsl", "wsl liste", "distributions linux",
+    ], "powershell", "wsl --list --verbose"),
+    JarvisCommand("wsl_shutdown", "dev", "Arreter toutes les distributions WSL", [
+        "arrete wsl", "stoppe wsl", "ferme wsl", "wsl shutdown",
+    ], "powershell", "wsl --shutdown"),
+    JarvisCommand("hyper_v_manager", "systeme", "Ouvrir le gestionnaire Hyper-V", [
+        "ouvre hyper-v", "lance hyper-v", "gestionnaire hyper-v",
+        "ouvre hyper v", "hyper-v manager",
+    ], "powershell", "virtmgmt.msc"),
+    JarvisCommand("terminal_settings", "app", "Ouvrir les parametres Windows Terminal", [
+        "parametres du terminal", "reglages terminal",
+        "settings terminal", "configure le terminal",
+    ], "powershell", "wt -p 'Settings'"),
+    JarvisCommand("sticky_keys_toggle", "accessibilite", "Activer/desactiver les touches remanentes", [
+        "active les touches remanentes", "desactive les touches remanentes",
+        "sticky keys", "touches remanentes",
+    ], "powershell", "Start-Process ms-settings:easeofaccess-keyboard"),
+    JarvisCommand("storage_sense", "systeme", "Activer l'assistant de stockage", [
+        "active l'assistant de stockage", "storage sense",
+        "nettoyage automatique", "assistant stockage",
+    ], "powershell", "Start-Process ms-settings:storagepolicies"),
+    JarvisCommand("creer_point_restauration", "systeme", "Creer un point de restauration systeme", [
+        "cree un point de restauration", "point de restauration",
+        "creer point de restauration", "sauvegarde systeme",
+    ], "powershell", "Checkpoint-Computer -Description 'JARVIS' -RestorePointType MODIFY_SETTINGS", True),
+    JarvisCommand("voir_hosts", "systeme", "Afficher le fichier hosts", [
+        "montre le fichier hosts", "affiche hosts", "ouvre hosts",
+        "fichier hosts",
+    ], "powershell", "Get-Content C:\\Windows\\System32\\drivers\\etc\\hosts"),
+    JarvisCommand("dxdiag", "systeme", "Lancer le diagnostic DirectX", [
+        "lance dxdiag", "diagnostic directx", "dxdiag",
+        "ouvre dxdiag", "directx diagnostic",
+    ], "powershell", "dxdiag"),
+    JarvisCommand("memoire_diagnostic", "systeme", "Lancer le diagnostic memoire Windows", [
+        "diagnostic memoire", "teste la memoire", "test ram",
+        "diagnostic ram", "memoire diagnostic",
+    ], "powershell", "MdSched.exe", True),
+    JarvisCommand("reset_reseau", "systeme", "Reinitialiser la pile reseau", [
+        "reinitialise le reseau", "reset reseau", "reset network",
+        "repare le reseau", "reinitialiser reseau",
+    ], "powershell", "netsh winsock reset; netsh int ip reset", True),
+    JarvisCommand("bitlocker_status", "systeme", "Verifier le statut BitLocker", [
+        "statut bitlocker", "etat bitlocker", "bitlocker status",
+        "chiffrement disque",
+    ], "powershell", "manage-bde -status"),
+    JarvisCommand("windows_update_pause", "systeme", "Mettre en pause les mises a jour Windows", [
+        "pause les mises a jour", "suspends les mises a jour",
+        "mets en pause windows update", "pause windows update",
+    ], "powershell", "Start-Process ms-settings:windowsupdate"),
+    JarvisCommand("mode_developpeur", "systeme", "Activer/desactiver le mode developpeur", [
+        "active le mode developpeur", "mode developpeur",
+        "developer mode", "mode dev",
+    ], "powershell", "Start-Process ms-settings:developers"),
+    JarvisCommand("remote_desktop", "systeme", "Parametres Bureau a distance", [
+        "bureau a distance", "remote desktop", "ouvre remote desktop",
+        "parametres bureau a distance", "rdp",
+    ], "powershell", "Start-Process ms-settings:remotedesktop"),
+    JarvisCommand("credential_manager", "systeme", "Ouvrir le gestionnaire d'identifiants", [
+        "gestionnaire d'identifiants", "credential manager",
+        "identifiants windows", "mots de passe enregistres",
+    ], "powershell", "control /name Microsoft.CredentialManager"),
+    JarvisCommand("certmgr", "systeme", "Ouvrir le gestionnaire de certificats", [
+        "gestionnaire de certificats", "certificats windows",
+        "certmgr", "ouvre les certificats",
+    ], "powershell", "certmgr.msc"),
+    JarvisCommand("chkdsk_check", "systeme", "Verifier les erreurs du disque", [
+        "verifie le disque", "check disk", "chkdsk",
+        "erreurs disque", "verifie les erreurs du disque",
+    ], "powershell", "chkdsk C: /scan"),
+    JarvisCommand("coller_sans_format", "clipboard", "Coller sans mise en forme", [
+        "colle sans format", "coller sans mise en forme",
+        "colle en texte brut", "paste plain text",
+    ], "hotkey", "ctrl+shift+v"),
+    JarvisCommand("file_history", "systeme", "Parametres historique des fichiers", [
+        "historique des fichiers", "file history",
+        "sauvegarde fichiers", "parametres file history",
+    ], "powershell", "Start-Process ms-settings:backup"),
+    JarvisCommand("troubleshoot_reseau", "systeme", "Lancer le depannage reseau", [
+        "depanne le reseau", "depannage reseau",
+        "troubleshoot reseau", "repare le wifi",
+    ], "powershell", "msdt.exe /id NetworkDiagnosticsWeb"),
+    JarvisCommand("troubleshoot_audio", "systeme", "Lancer le depannage audio", [
+        "depanne le son", "depannage audio",
+        "troubleshoot audio", "repare le son",
+    ], "powershell", "msdt.exe /id AudioPlaybackDiagnostic"),
+    JarvisCommand("troubleshoot_update", "systeme", "Lancer le depannage Windows Update", [
+        "depanne windows update", "depannage mises a jour",
+        "troubleshoot update", "repare les mises a jour",
+    ], "powershell", "msdt.exe /id WindowsUpdateDiagnostic"),
+    JarvisCommand("power_options", "systeme", "Options d'alimentation avancees", [
+        "options d'alimentation", "power options",
+        "alimentation avancee", "gestion energie avancee",
+    ], "powershell", "powercfg.cpl"),
 ]
 
 
@@ -2280,6 +2382,47 @@ VOICE_CORRECTIONS: dict[str, str] = {
     "diagnostique": "diagnostic",
     "diagnostik": "diagnostic",
     "wifie": "wifi",
+    # Vague 17 — WSL / Hyper-V / Diagnostics / Securite
+    "doubleyou esse elle": "wsl",
+    "wessel": "wsl",
+    "w s l": "wsl",
+    "linuxe": "linux",
+    "linuks": "linux",
+    "hipeur v": "hyper-v",
+    "hyper vi": "hyper-v",
+    "hiperv": "hyper-v",
+    "stiky keys": "sticky keys",
+    "touche remanante": "touches remanentes",
+    "remanentes": "remanentes",
+    "remanante": "remanentes",
+    "stockaje sens": "storage sense",
+    "restaurassion": "restauration",
+    "restoracion": "restauration",
+    "oste": "hosts",
+    "hostes": "hosts",
+    "dxdiague": "dxdiag",
+    "directx": "directx",
+    "memwar diagnostic": "memoire diagnostic",
+    "bitlockeur": "bitlocker",
+    "bitelocker": "bitlocker",
+    "chiffremant": "chiffrement",
+    "developeur": "developpeur",
+    "developpeure": "developpeur",
+    "dev mode": "mode developpeur",
+    "remotte desktop": "remote desktop",
+    "bureau a distanse": "bureau a distance",
+    "credantial": "credential",
+    "identifiant": "identifiants",
+    "certmgr": "certmgr",
+    "sertmgr": "certmgr",
+    "check disk": "chkdsk",
+    "tchek disk": "chkdsk",
+    "troubleshoote": "troubleshoot",
+    "depannaje": "depannage",
+    "depanage": "depannage",
+    "power opchions": "power options",
+    "alimentassion avancee": "alimentation avancee",
+    "terminale settings": "terminal settings",
 }
 
 
