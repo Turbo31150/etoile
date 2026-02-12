@@ -1464,6 +1464,88 @@ COMMANDS: list[JarvisCommand] = [
         "suggere un skill", "brain suggest", "invente un skill",
         "cree un nouveau skill", "propose un pipeline",
     ], "jarvis_tool", "brain_suggest"),
+
+    # ── Vague 15: Widgets / Store / Explorer tabs / Clipboard cloud / Recall / Phone Link ──
+    JarvisCommand("ouvrir_widgets", "systeme", "Ouvrir le panneau Widgets Windows", [
+        "ouvre les widgets", "widgets windows", "panneau widgets",
+        "affiche les widgets", "montre les widgets",
+    ], "hotkey", "win+w"),
+    JarvisCommand("clipboard_historique", "clipboard", "Ouvrir l'historique du presse-papier", [
+        "historique presse papier", "clipboard history", "ouvre l'historique clipboard",
+        "historique du copier coller", "presse papier historique",
+    ], "hotkey", "win+v"),
+    JarvisCommand("ouvrir_emojis", "saisie", "Ouvrir le panneau emojis", [
+        "ouvre les emojis", "panneau emojis", "emoji picker",
+        "insere un emoji", "emojis",
+    ], "hotkey", "win+."),
+    JarvisCommand("ouvrir_dictee", "saisie", "Activer la dictee vocale Windows", [
+        "dicte", "dictee windows", "active la dictee",
+        "reconnaissance vocale", "speech to text",
+    ], "hotkey", "win+h"),
+    JarvisCommand("store_ouvrir", "app", "Ouvrir le Microsoft Store", [
+        "ouvre le store", "microsoft store", "ouvre le magasin",
+        "app store windows", "store windows",
+    ], "powershell", "Start-Process ms-windows-store:"),
+    JarvisCommand("store_updates", "app", "Verifier les mises a jour du Store", [
+        "mises a jour store", "store updates", "update les apps",
+        "met a jour les applications", "verifier updates store",
+    ], "powershell", "Start-Process ms-windows-store://downloadsandupdates"),
+    JarvisCommand("explorer_nouvel_onglet", "fichiers", "Nouvel onglet dans l'Explorateur", [
+        "nouvel onglet explorateur", "onglet explorateur", "new tab explorer",
+        "ajoute un onglet fichiers",
+    ], "powershell", "Start-Process explorer.exe"),
+    JarvisCommand("partage_proximite_on", "systeme", "Activer le partage de proximite", [
+        "active le partage de proximite", "nearby sharing on",
+        "partage proximite actif", "active nearby share",
+    ], "powershell", "Start-Process ms-settings:crossdevice"),
+    JarvisCommand("screen_recording", "systeme", "Lancer l'enregistrement d'ecran (Game Bar)", [
+        "enregistre l'ecran", "screen recording", "capture video",
+        "lance l'enregistrement ecran", "game bar record",
+    ], "hotkey", "win+alt+r"),
+    JarvisCommand("game_bar", "systeme", "Ouvrir la Game Bar Xbox", [
+        "ouvre la game bar", "game bar", "xbox game bar",
+        "barre de jeu", "game overlay",
+    ], "hotkey", "win+g"),
+    JarvisCommand("ouvrir_phone_link", "app", "Ouvrir Phone Link (liaison telephone)", [
+        "ouvre phone link", "liaison telephone", "phone link",
+        "connecte le telephone", "lien telephone",
+    ], "powershell", "Start-Process ms-phone:"),
+    JarvisCommand("parametres_notifications", "systeme", "Ouvrir les parametres de notifications", [
+        "parametres notifications", "gere les notifications",
+        "reglages notifications", "settings notifications",
+    ], "powershell", "Start-Process ms-settings:notifications"),
+    JarvisCommand("parametres_apps_defaut", "systeme", "Ouvrir les apps par defaut", [
+        "apps par defaut", "applications par defaut",
+        "change les apps par defaut", "default apps",
+    ], "powershell", "Start-Process ms-settings:defaultapps"),
+    JarvisCommand("parametres_about", "systeme", "A propos de ce PC", [
+        "a propos du pc", "about this pc", "infos pc",
+        "quel est mon pc", "specs du pc",
+    ], "powershell", "Start-Process ms-settings:about"),
+    JarvisCommand("verifier_sante_disque", "systeme", "Verifier la sante des disques", [
+        "sante des disques", "health check disque", "smart disque",
+        "etat du ssd", "check ssd",
+    ], "powershell", "Get-PhysicalDisk | Select FriendlyName, MediaType, HealthStatus, Size, @{N='Size(GB)';E={[math]::Round($_.Size/1GB)}} | Out-String"),
+    JarvisCommand("vitesse_internet", "systeme", "Tester la vitesse internet", [
+        "test de vitesse", "speed test", "vitesse internet",
+        "test la connexion", "ping speed",
+    ], "powershell", "$ping = (Test-Connection 8.8.8.8 -Count 4 -ErrorAction SilentlyContinue | Measure ResponseTime -Average).Average; \"Latence moyenne: $([math]::Round($ping,1)) ms\""),
+    JarvisCommand("historique_mises_a_jour", "systeme", "Voir l'historique des mises a jour Windows", [
+        "historique updates", "dernieres mises a jour",
+        "updates windows recentes", "quelles mises a jour",
+    ], "powershell", "Get-HotFix | Sort InstalledOn -Descending | Select -First 10 HotFixID, Description, InstalledOn | Out-String"),
+    JarvisCommand("taches_planifiees", "systeme", "Lister les taches planifiees", [
+        "taches planifiees", "scheduled tasks", "task scheduler",
+        "quelles taches sont planifiees", "liste taches auto",
+    ], "powershell", "Get-ScheduledTask | Where State -eq 'Ready' | Select -First 15 TaskName, State | Out-String"),
+    JarvisCommand("demarrage_apps", "systeme", "Voir les apps au demarrage", [
+        "apps au demarrage", "startup apps", "programmes au demarrage",
+        "quoi se lance au boot", "demarrage automatique",
+    ], "powershell", "Get-CimInstance Win32_StartupCommand | Select Name, Command, Location | Out-String"),
+    JarvisCommand("certificats_ssl", "systeme", "Verifier un certificat SSL", [
+        "verifie le ssl de {site}", "certificat ssl {site}",
+        "check ssl {site}", "ssl {site}",
+    ], "powershell", "$r = [Net.HttpWebRequest]::Create('https://{site}'); $r.GetResponse() | Out-Null; $c = $r.ServicePoint.Certificate; \"SSL {site}: $($c.Subject) | Expire: $($c.GetExpirationDateString())\"", ["site"]),
 ]
 
 
@@ -2002,6 +2084,33 @@ VOICE_CORRECTIONS: dict[str, str] = {
     "renome": "renomme",
     "propriete": "proprietes",
     "propriaite": "proprietes",
+    # Vague 15 — Widgets / Store / Explorer / Phone Link
+    "widjets": "widgets",
+    "wigets": "widgets",
+    "widgettes": "widgets",
+    "emojie": "emoji",
+    "emojis": "emojis",
+    "emogis": "emojis",
+    "storre": "store",
+    "stor": "store",
+    "microsof store": "microsoft store",
+    "fone link": "phone link",
+    "fone linke": "phone link",
+    "guame bar": "game bar",
+    "gayme bar": "game bar",
+    "clipborde": "clipboard",
+    "presse papie": "presse papier",
+    "presspapier": "presse papier",
+    "diktee": "dictee",
+    "dictai": "dictee",
+    "proximitee": "proximite",
+    "proximiter": "proximite",
+    "spide test": "speed test",
+    "spid test": "speed test",
+    "essessdee": "ssd",
+    "ssd": "ssd",
+    "startupe": "startup",
+    "essessel": "ssl",
 }
 
 
