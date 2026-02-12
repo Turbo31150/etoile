@@ -1785,6 +1785,139 @@ COMMANDS: list[JarvisCommand] = [
         "options d'alimentation", "power options",
         "alimentation avancee", "gestion energie avancee",
     ], "powershell", "powercfg.cpl"),
+
+    # ══════════════════════════════════════════════════════════════════════
+    # VAGUE 18 — Copilot/AI, Screenshots, Planificateur, Disque, USB,
+    #            Adaptateurs reseau, Firewall, Langue, NTP, Securite (28)
+    # ══════════════════════════════════════════════════════════════════════
+
+    # ── Copilot / AI ─────────────────────────────────────────────────────
+    JarvisCommand("copilot_lancer", "app", "Lancer Windows Copilot", [
+        "lance copilot", "ouvre copilot", "copilot",
+        "demarre copilot", "active copilot",
+    ], "hotkey", "win+c"),
+    JarvisCommand("copilot_parametres", "systeme", "Parametres de Copilot", [
+        "parametres copilot", "reglages copilot", "config copilot",
+        "copilot settings",
+    ], "ms_settings", "ms-settings:copilot"),
+    JarvisCommand("cortana_desactiver", "systeme", "Desactiver Cortana", [
+        "desactive cortana", "coupe cortana", "cortana off",
+        "arrete cortana", "disable cortana",
+    ], "powershell", "Get-AppxPackage -Name Microsoft.549981C3F5F10 | Remove-AppxPackage -ErrorAction SilentlyContinue; 'Cortana desactivee'"),
+
+    # ── Screenshots avances ──────────────────────────────────────────────
+    JarvisCommand("capture_fenetre", "systeme", "Capturer la fenetre active", [
+        "capture la fenetre", "screenshot fenetre", "capture fenetre active",
+        "capture cette fenetre", "copie la fenetre",
+    ], "hotkey", "alt+printscreen"),
+    JarvisCommand("capture_retardee", "systeme", "Capture d'ecran avec delai", [
+        "capture retardee", "screenshot retarde", "capture dans 5 secondes",
+        "capture avec delai", "screenshot timer",
+    ], "powershell", "Start-Process snippingtool /clip; Start-Sleep 1; Add-Type -AssemblyName System.Windows.Forms; [System.Windows.Forms.SendKeys]::SendWait('%{d}'); 'Capture retardee lancee'"),
+    JarvisCommand("dossier_captures", "fichiers", "Ouvrir le dossier captures d'ecran", [
+        "dossier captures", "ouvre les captures", "dossier screenshots",
+        "mes screenshots", "dossier capture ecran",
+    ], "powershell", "Start-Process ([Environment]::GetFolderPath('MyPictures') + '\\Screenshots')"),
+
+    # ── Planificateur de taches ──────────────────────────────────────────
+    JarvisCommand("planificateur_ouvrir", "systeme", "Ouvrir le planificateur de taches", [
+        "planificateur de taches", "ouvre le planificateur", "task scheduler",
+        "ouvre task scheduler", "planificateur",
+    ], "powershell", "Start-Process taskschd.msc"),
+    JarvisCommand("creer_tache_planifiee", "systeme", "Creer une tache planifiee", [
+        "cree une tache planifiee", "nouvelle tache planifiee",
+        "ajoute une tache planifiee", "planifie une tache",
+    ], "powershell", "Start-Process taskschd.msc -ArgumentList '/Create'"),
+
+    # ── Disque avance ────────────────────────────────────────────────────
+    JarvisCommand("espace_disque", "systeme", "Afficher l'espace disque utilise", [
+        "utilisation disque", "taille des disques", "espace libre disques",
+        "montre l'espace disque", "infos espace disques",
+    ], "powershell", "Get-PSDrive -PSProvider FileSystem | Select Name, @{N='Used(GB)';E={[math]::Round($_.Used/1GB,1)}}, @{N='Free(GB)';E={[math]::Round($_.Free/1GB,1)}}, @{N='Total(GB)';E={[math]::Round(($_.Used+$_.Free)/1GB,1)}} | Out-String"),
+
+    # ── USB / Peripheriques ──────────────────────────────────────────────
+    JarvisCommand("lister_usb", "systeme", "Lister les peripheriques USB connectes", [
+        "liste les usb", "peripheriques usb", "usb connectes",
+        "quels usb", "lister usb",
+    ], "powershell", "Get-PnpDevice -PresentOnly | Where-Object { $_.InstanceId -like 'USB*' } | Select FriendlyName, Status | Out-String"),
+    JarvisCommand("ejecter_usb", "systeme", "Ejecter un peripherique USB en securite", [
+        "ejecte l'usb", "ejecter usb", "retire l'usb",
+        "ejecte le peripherique", "safely remove usb",
+    ], "powershell", "$vol = (Get-Volume | Where-Object { $_.DriveType -eq 'Removable' } | Select -First 1); if($vol){ $dl = $vol.DriveLetter; (New-Object -ComObject Shell.Application).Namespace(17).ParseName(\"${dl}:\").InvokeVerb('Eject'); \"USB ${dl}: ejecte\" } else { 'Aucun USB amovible detecte' }"),
+    JarvisCommand("peripheriques_connectes", "systeme", "Lister tous les peripheriques connectes", [
+        "peripheriques connectes", "liste les peripheriques",
+        "appareils connectes", "devices connectes",
+    ], "powershell", "Get-PnpDevice -PresentOnly -Status OK | Select -First 25 Class, FriendlyName | Sort Class | Out-String"),
+
+    # ── Adaptateurs reseau ───────────────────────────────────────────────
+    JarvisCommand("lister_adaptateurs", "systeme", "Lister les adaptateurs reseau", [
+        "liste les adaptateurs reseau", "adaptateurs reseau",
+        "interfaces reseau", "cartes reseau status",
+    ], "powershell", "Get-NetAdapter | Select Name, InterfaceDescription, Status, LinkSpeed | Out-String"),
+    JarvisCommand("desactiver_wifi_adaptateur", "systeme", "Desactiver l'adaptateur Wi-Fi", [
+        "desactive le wifi", "coupe l'adaptateur wifi",
+        "wifi off adaptateur", "desactive la carte wifi",
+    ], "powershell", "Disable-NetAdapter -Name 'Wi-Fi' -Confirm:$false; 'Adaptateur Wi-Fi desactive'"),
+    JarvisCommand("activer_wifi_adaptateur", "systeme", "Activer l'adaptateur Wi-Fi", [
+        "active l'adaptateur wifi", "reactive le wifi",
+        "wifi on adaptateur", "active la carte wifi",
+    ], "powershell", "Enable-NetAdapter -Name 'Wi-Fi' -Confirm:$false; 'Adaptateur Wi-Fi active'"),
+
+    # ── Firewall avance ──────────────────────────────────────────────────
+    JarvisCommand("firewall_status", "systeme", "Afficher le statut du pare-feu", [
+        "statut pare-feu", "statut firewall", "firewall status",
+        "etat du pare-feu", "etat firewall",
+    ], "powershell", "Get-NetFirewallProfile | Select Name, Enabled, DefaultInboundAction, DefaultOutboundAction | Out-String"),
+    JarvisCommand("firewall_regles", "systeme", "Lister les regles du pare-feu", [
+        "regles pare-feu", "regles firewall", "firewall rules",
+        "liste les regles du firewall",
+    ], "powershell", "Get-NetFirewallRule -Enabled True -Direction Inbound | Select -First 20 DisplayName, Action | Out-String"),
+    JarvisCommand("firewall_reset", "systeme", "Reinitialiser le pare-feu", [
+        "reinitialise le pare-feu", "reset firewall", "firewall reset",
+        "restaure le pare-feu par defaut",
+    ], "powershell", "netsh advfirewall reset; 'Pare-feu reinitialise aux parametres par defaut'"),
+
+    # ── Langue / Clavier ─────────────────────────────────────────────────
+    JarvisCommand("ajouter_langue", "systeme", "Ajouter une langue au systeme", [
+        "ajoute une langue", "installer une langue", "nouvelle langue",
+        "ajouter langue systeme",
+    ], "ms_settings", "ms-settings:regionlanguage-adddisplaylanguage"),
+    JarvisCommand("ajouter_clavier", "systeme", "Ajouter une disposition de clavier", [
+        "ajoute un clavier", "nouveau clavier", "ajouter disposition clavier",
+        "ajouter layout clavier",
+    ], "ms_settings", "ms-settings:keyboard"),
+    JarvisCommand("langues_installees", "systeme", "Lister les langues installees", [
+        "langues installees", "quelles langues", "liste des langues",
+        "langues du systeme", "languages installed",
+    ], "powershell", "Get-WinUserLanguageList | Select LanguageTag, InputMethodTips, Spellchecking | Out-String"),
+
+    # ── Synchronisation heure / NTP ──────────────────────────────────────
+    JarvisCommand("synchroniser_heure", "systeme", "Synchroniser l'heure avec le serveur NTP", [
+        "synchronise l'heure", "sync heure", "mettre a l'heure",
+        "resynchronise l'horloge", "sync ntp",
+    ], "powershell", "w32tm /resync /force; 'Heure synchronisee avec le serveur NTP'"),
+    JarvisCommand("serveur_ntp", "systeme", "Afficher le serveur NTP configure", [
+        "serveur ntp", "quel serveur ntp", "serveur de temps",
+        "ntp info", "ntp status",
+    ], "powershell", "w32tm /query /status | Out-String"),
+
+    # ── Securite avancee ─────────────────────────────────────────────────
+    JarvisCommand("windows_hello", "systeme", "Parametres Windows Hello", [
+        "windows hello", "hello biometrique", "parametres hello",
+        "reconnaissance faciale", "empreinte digitale",
+    ], "ms_settings", "ms-settings:signinoptions"),
+    JarvisCommand("securite_comptes", "systeme", "Securite des comptes Windows", [
+        "securite des comptes", "securite compte", "protection compte",
+        "account security", "securite mon compte",
+    ], "ms_settings", "ms-settings:signinoptions-launchfaceenrollment"),
+    JarvisCommand("activation_windows", "systeme", "Verifier l'activation Windows", [
+        "activation windows", "windows active", "statut activation",
+        "licence windows", "est-ce que windows est active",
+    ], "powershell", "$l = (Get-CimInstance SoftwareLicensingProduct -Filter \"Name like 'Windows%'\" | Where PartialProductKey).LicenseStatus; if($l -eq 1){'Windows est ACTIVE'}else{'Windows NON active'}"),
+    JarvisCommand("recuperation_systeme", "systeme", "Options de recuperation systeme", [
+        "recuperation systeme", "options de recuperation", "recovery",
+        "reinstaller windows", "reset pc",
+    ], "ms_settings", "ms-settings:recovery"),
 ]
 
 
@@ -2423,6 +2556,53 @@ VOICE_CORRECTIONS: dict[str, str] = {
     "power opchions": "power options",
     "alimentassion avancee": "alimentation avancee",
     "terminale settings": "terminal settings",
+    # Vague 18 — Copilot / Screenshots / Planificateur / USB / Firewall / NTP
+    "kopilot": "copilot",
+    "copilote": "copilot",
+    "co pilot": "copilot",
+    "copailot": "copilot",
+    "cortanna": "cortana",
+    "korttana": "cortana",
+    "cortanah": "cortana",
+    "screenchot": "screenshot",
+    "screenchotte": "screenshot",
+    "fenaitre": "fenetre",
+    "fenaitre active": "fenetre active",
+    "plannificateur": "planificateur",
+    "plannifiquateur": "planificateur",
+    "planificateure": "planificateur",
+    "tache plannifiee": "tache planifiee",
+    "espace disck": "espace disque",
+    "espasse disque": "espace disque",
+    "nettoyaje": "nettoyage",
+    "netoyage": "nettoyage",
+    "cleanmgre": "cleanmgr",
+    "u s b": "usb",
+    "uessbi": "usb",
+    "ejecte": "ejecte",
+    "ejekte": "ejecte",
+    "periferiue connecte": "peripheriques connectes",
+    "adaptateure": "adaptateur",
+    "adaptateur": "adaptateur",
+    "fairewall": "firewall",
+    "fayrewall": "firewall",
+    "fire wall": "firewall",
+    "langeu": "langue",
+    "languee": "langue",
+    "clavie layout": "clavier layout",
+    "syncro heure": "sync heure",
+    "sincronise": "synchronise",
+    "sinkronise": "synchronise",
+    "n t p": "ntp",
+    "helo biometrique": "hello biometrique",
+    "helloo": "hello",
+    "activassion": "activation",
+    "recupperacion": "recuperation",
+    "recuperassion": "recuperation",
+    "youtoube": "youtube",
+    "yutube": "youtube",
+    "termenal": "terminal",
+    "tairmenal": "terminal",
 }
 
 
@@ -2446,8 +2626,26 @@ def correct_voice_text(text: str) -> str:
 
 
 def similarity(a: str, b: str) -> float:
-    """Calculate string similarity ratio (0.0 to 1.0)."""
-    return SequenceMatcher(None, a.lower(), b.lower()).ratio()
+    """Calculate string similarity ratio (0.0 to 1.0).
+
+    Uses SequenceMatcher as primary, with a bag-of-words bonus
+    to handle word-order inversions from STT.
+    """
+    a_low, b_low = a.lower(), b.lower()
+    seq_score = SequenceMatcher(None, a_low, b_low).ratio()
+
+    # Bag-of-words: compare word sets (order-insensitive)
+    words_a = set(a_low.split())
+    words_b = set(b_low.split())
+    if words_a and words_b:
+        intersection = words_a & words_b
+        union = words_a | words_b
+        bow_score = len(intersection) / len(union) if union else 0.0
+    else:
+        bow_score = 0.0
+
+    # Weighted: 70% sequence, 30% bag-of-words
+    return seq_score * 0.70 + bow_score * 0.30
 
 
 def match_command(voice_text: str, threshold: float = 0.55) -> tuple[JarvisCommand | None, dict[str, str], float]:
