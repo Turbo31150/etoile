@@ -1546,6 +1546,143 @@ COMMANDS: list[JarvisCommand] = [
         "verifie le ssl de {site}", "certificat ssl {site}",
         "check ssl {site}", "ssl {site}",
     ], "powershell", "$r = [Net.HttpWebRequest]::Create('https://{site}'); $r.GetResponse() | Out-Null; $c = $r.ServicePoint.Certificate; \"SSL {site}: $($c.Subject) | Expire: $($c.GetExpirationDateString())\"", ["site"]),
+
+    # ── Vague 16: Audio / Imprimantes / Sandbox / Accessibilite / Power / Multi-ecrans ──
+    # Audio avance
+    JarvisCommand("audio_sortie", "systeme", "Changer la sortie audio", [
+        "change la sortie audio", "sortie audio", "output audio",
+        "haut parleurs", "casque audio",
+    ], "powershell", "Start-Process ms-settings:sound"),
+    JarvisCommand("audio_entree", "systeme", "Configurer le microphone", [
+        "configure le micro", "entree audio", "input audio",
+        "parametres micro", "reglages microphone",
+    ], "powershell", "Start-Process ms-settings:sound"),
+    JarvisCommand("volume_app", "systeme", "Mixer de volume par application", [
+        "mixer volume", "volume par application", "volume des apps",
+        "ajuste le volume par app", "sound mixer",
+    ], "powershell", "Start-Process ms-settings:apps-volume"),
+    JarvisCommand("micro_mute_toggle", "systeme", "Couper/reactiver le micro", [
+        "coupe le micro", "mute le micro", "micro off",
+        "reactive le micro", "micro on", "unmute micro",
+    ], "powershell", "$wshell = New-Object -ComObject WScript.Shell; $wshell.SendKeys([char]0xAD)"),
+
+    # Imprimantes
+    JarvisCommand("liste_imprimantes", "systeme", "Lister les imprimantes", [
+        "liste les imprimantes", "quelles imprimantes", "imprimantes disponibles",
+        "mes imprimantes", "printers",
+    ], "powershell", "Get-Printer | Select Name, DriverName, PortName, PrinterStatus | Out-String"),
+    JarvisCommand("imprimante_defaut", "systeme", "Voir l'imprimante par defaut", [
+        "imprimante par defaut", "quelle imprimante", "default printer",
+        "imprimante principale",
+    ], "powershell", "(Get-CimInstance -ClassName Win32_Printer | Where Default -eq $true).Name"),
+    JarvisCommand("param_imprimantes", "systeme", "Ouvrir les parametres imprimantes", [
+        "parametres imprimantes", "settings imprimantes",
+        "gere les imprimantes", "ajoute une imprimante",
+    ], "powershell", "Start-Process ms-settings:printers"),
+
+    # Windows Sandbox
+    JarvisCommand("sandbox_ouvrir", "systeme", "Ouvrir Windows Sandbox", [
+        "ouvre la sandbox", "windows sandbox", "lance la sandbox",
+        "environnement sandbox", "bac a sable",
+    ], "powershell", "Start-Process WindowsSandbox"),
+
+    # Accessibilite avancee
+    JarvisCommand("contraste_eleve_toggle", "accessibilite", "Activer/desactiver le contraste eleve", [
+        "contraste eleve", "high contrast", "active le contraste",
+        "mode contraste", "ameliore la visibilite",
+    ], "powershell", "Start-Process ms-settings:easeofaccess-highcontrast"),
+    JarvisCommand("sous_titres_live", "accessibilite", "Activer les sous-titres en direct", [
+        "sous titres en direct", "live captions", "active les sous titres",
+        "transcription en direct", "captions on",
+    ], "powershell", "Start-Process ms-settings:easeofaccess-closedcaptioning"),
+    JarvisCommand("filtre_couleur_toggle", "accessibilite", "Activer les filtres de couleur", [
+        "filtre de couleur", "color filter", "daltonien",
+        "mode daltonien", "filtre couleur",
+    ], "powershell", "Start-Process ms-settings:easeofaccess-colorfilter"),
+    JarvisCommand("taille_curseur", "accessibilite", "Changer la taille du curseur", [
+        "agrandis le curseur", "curseur plus grand", "taille curseur",
+        "curseur visible", "gros curseur",
+    ], "powershell", "Start-Process ms-settings:easeofaccess-cursorandpointersize"),
+    JarvisCommand("narrateur_toggle", "accessibilite", "Activer/desactiver le narrateur", [
+        "active le narrateur", "narrateur windows", "desactive le narrateur",
+        "lecteur ecran", "screen reader",
+    ], "powershell", "Start-Process ms-settings:easeofaccess-narrator"),
+
+    # Power Management avance
+    JarvisCommand("plan_alimentation_actif", "systeme", "Voir le plan d'alimentation actif", [
+        "quel plan alimentation", "power plan actif",
+        "plan energie actif", "quel mode energie",
+    ], "powershell", "(powercfg /getactivescheme) -replace '.*: ','' | Out-String"),
+    JarvisCommand("batterie_rapport", "systeme", "Generer un rapport de batterie", [
+        "rapport batterie", "battery report", "sante de la batterie",
+        "etat batterie", "battery health",
+    ], "powershell", "powercfg /batteryreport /output $env:USERPROFILE\\Desktop\\battery_report.html; Start-Process $env:USERPROFILE\\Desktop\\battery_report.html; 'Rapport genere sur le Bureau'"),
+    JarvisCommand("ecran_timeout", "systeme", "Configurer la mise en veille ecran", [
+        "timeout ecran", "ecran en veille apres",
+        "delai mise en veille ecran", "screen timeout",
+    ], "powershell", "Start-Process ms-settings:powersleep"),
+
+    # Multi-ecrans avance
+    JarvisCommand("detecter_ecrans", "systeme", "Detecter les ecrans connectes", [
+        "detecte les ecrans", "detect displays", "cherche les ecrans",
+        "combien d'ecrans", "ecrans connectes",
+    ], "powershell", "Get-CimInstance -Namespace root\\wmi -ClassName WmiMonitorBasicDisplayParams | Select InstanceName, Active | Out-String"),
+    JarvisCommand("param_affichage", "systeme", "Ouvrir les parametres d'affichage", [
+        "parametres affichage", "settings display",
+        "reglages ecran", "display settings",
+    ], "powershell", "Start-Process ms-settings:display"),
+
+    # Processus avance
+    JarvisCommand("kill_process_nom", "systeme", "Tuer un processus par nom", [
+        "tue le processus {nom}", "kill {nom}", "ferme le processus {nom}",
+        "arrete le processus {nom}", "stop {nom}",
+    ], "powershell", "Stop-Process -Name '{nom}' -Force -ErrorAction SilentlyContinue; 'Processus {nom} arrete'", ["nom"], confirm=True),
+    JarvisCommand("processus_details", "systeme", "Details d'un processus", [
+        "details du processus {nom}", "info processus {nom}",
+        "combien consomme {nom}", "ressources de {nom}",
+    ], "powershell", "Get-Process '{nom}' -ErrorAction SilentlyContinue | Select Name, CPU, @{N='RAM(MB)';E={[math]::Round($_.WorkingSet64/1MB,1)}}, StartTime | Out-String", ["nom"]),
+
+    # Reseau diagnostics
+    JarvisCommand("diagnostic_reseau", "systeme", "Lancer un diagnostic reseau complet", [
+        "diagnostic reseau", "diagnostique le reseau",
+        "probleme reseau", "repare le reseau", "network diagnostic",
+    ], "powershell", "$ping = Test-Connection 8.8.8.8 -Count 2 -ErrorAction SilentlyContinue; $dns = Resolve-DnsName google.com -ErrorAction SilentlyContinue; if($ping){'Ping: OK'}else{'Ping: ECHEC'}; if($dns){'DNS: OK'}else{'DNS: ECHEC'}"),
+    JarvisCommand("wifi_mot_de_passe", "systeme", "Afficher le mot de passe WiFi actuel", [
+        "mot de passe wifi", "password wifi", "cle wifi",
+        "montre le mot de passe wifi", "wifi password",
+    ], "powershell", "$p = (netsh wlan show profile name=(netsh wlan show interfaces | Select-String 'Profil' | ForEach-Object { ($_ -split ':')[1].Trim() }) key=clear | Select-String 'Contenu de la cl' | ForEach-Object { ($_ -split ':')[1].Trim() }); if($p){\"WiFi Password: $p\"}else{'Non disponible'}"),
+
+    # Outils systeme
+    JarvisCommand("ouvrir_evenements", "systeme", "Ouvrir l'observateur d'evenements", [
+        "observateur evenements", "event viewer", "journaux windows",
+        "logs windows", "evenements systeme",
+    ], "powershell", "Start-Process eventvwr.msc"),
+    JarvisCommand("ouvrir_services", "systeme", "Ouvrir les services Windows", [
+        "ouvre les services", "services windows", "gere les services",
+        "service manager",
+    ], "powershell", "Start-Process services.msc"),
+    JarvisCommand("ouvrir_moniteur_perf", "systeme", "Ouvrir le moniteur de performances", [
+        "moniteur de performance", "performance monitor",
+        "moniteur perf", "perfmon",
+    ], "powershell", "Start-Process perfmon.msc"),
+    JarvisCommand("ouvrir_fiabilite", "systeme", "Ouvrir le moniteur de fiabilite", [
+        "moniteur de fiabilite", "reliability monitor",
+        "fiabilite windows", "historique de fiabilite",
+    ], "powershell", "Start-Process perfmon /rel"),
+
+    # Raccourcis Windows avances
+    JarvisCommand("action_center", "systeme", "Ouvrir le centre de notifications", [
+        "centre de notifications", "notification center",
+        "action center", "ouvre les notifications",
+    ], "hotkey", "win+n"),
+    JarvisCommand("quick_settings", "systeme", "Ouvrir les parametres rapides", [
+        "parametres rapides", "quick settings", "raccourcis rapides",
+        "ouvre les parametres rapides",
+    ], "hotkey", "win+a"),
+    JarvisCommand("search_windows", "systeme", "Ouvrir la recherche Windows", [
+        "recherche windows", "windows search", "ouvre la recherche",
+        "cherche dans windows",
+    ], "hotkey", "win+s"),
 ]
 
 
@@ -2111,6 +2248,38 @@ VOICE_CORRECTIONS: dict[str, str] = {
     "ssd": "ssd",
     "startupe": "startup",
     "essessel": "ssl",
+    # Vague 16 — Audio / Imprimantes / Sandbox / Accessibilite
+    "odio": "audio",
+    "audi eau": "audio",
+    "mikro": "micro",
+    "mikrofone": "microphone",
+    "microfone": "microphone",
+    "imprimente": "imprimante",
+    "imprimentes": "imprimantes",
+    "printeur": "printer",
+    "sandboxe": "sandbox",
+    "bac a sable": "sandbox",
+    "kontrasste": "contraste",
+    "contraste elevee": "contraste eleve",
+    "narrateure": "narrateur",
+    "narrarteur": "narrateur",
+    "daltonient": "daltonien",
+    "courseur": "curseur",
+    "cursseur": "curseur",
+    "alimentassion": "alimentation",
+    "alimentationt": "alimentation",
+    "batteurie": "batterie",
+    "baterie": "batterie",
+    "serrvice": "service",
+    "serrvices": "services",
+    "perfmone": "perfmon",
+    "evennement": "evenement",
+    "evenemant": "evenement",
+    "fiabilitee": "fiabilite",
+    "fiabiliter": "fiabilite",
+    "diagnostique": "diagnostic",
+    "diagnostik": "diagnostic",
+    "wifie": "wifi",
 }
 
 

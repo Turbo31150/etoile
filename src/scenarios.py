@@ -948,6 +948,152 @@ SCENARIO_TEMPLATES: list[dict] = [
      "description": "STT retourne 'fone link' au lieu de 'phone link'",
      "voice_input": "ouvre fone link", "expected": ["ouvrir_phone_link", "ouvrir_app"],
      "expected_result": "Correction phonetique phone link"},
+
+    # ═══════════════════════════════════════════════════════════════════
+    # VAGUE 16 — Audio / Imprimantes / Sandbox / Accessibilite / Power
+    # ═══════════════════════════════════════════════════════════════════
+
+    # ── AUDIO ─────────────────────────────────────────────────────────
+    {"name": "sys_audio_sortie", "category": "systeme", "difficulty": "easy",
+     "description": "Changer la sortie audio",
+     "voice_input": "sortie audio", "expected": ["audio_sortie"],
+     "expected_result": "Settings son ouvert"},
+    {"name": "sys_volume_mixer", "category": "systeme", "difficulty": "normal",
+     "description": "Mixer de volume par app",
+     "voice_input": "mixer volume", "expected": ["volume_app"],
+     "expected_result": "Mixer volume ouvert"},
+    {"name": "sys_micro_mute", "category": "systeme", "difficulty": "easy",
+     "description": "Couper le micro",
+     "voice_input": "coupe le micro", "expected": ["micro_mute_toggle", "micro_mute"],
+     "expected_result": "Micro coupe"},
+
+    # ── IMPRIMANTES ──────────────────────────────────────────────────
+    {"name": "sys_imprimantes", "category": "systeme", "difficulty": "easy",
+     "description": "Lister les imprimantes",
+     "voice_input": "liste les imprimantes", "expected": ["liste_imprimantes"],
+     "expected_result": "Imprimantes listees"},
+    {"name": "sys_imprimante_defaut", "category": "systeme", "difficulty": "normal",
+     "description": "Voir l'imprimante par defaut",
+     "voice_input": "imprimante par defaut", "expected": ["imprimante_defaut"],
+     "expected_result": "Imprimante par defaut affichee"},
+    {"name": "sys_param_imprimantes", "category": "systeme", "difficulty": "easy",
+     "description": "Parametres imprimantes",
+     "voice_input": "parametres imprimantes", "expected": ["param_imprimantes"],
+     "expected_result": "Settings imprimantes ouvert"},
+
+    # ── SANDBOX ──────────────────────────────────────────────────────
+    {"name": "sys_sandbox", "category": "systeme", "difficulty": "normal",
+     "description": "Ouvrir Windows Sandbox",
+     "voice_input": "ouvre la sandbox", "expected": ["sandbox_ouvrir", "ouvrir_sandbox"],
+     "expected_result": "Sandbox ouverte"},
+
+    # ── ACCESSIBILITE AVANCEE ────────────────────────────────────────
+    {"name": "access_contraste", "category": "accessibilite", "difficulty": "normal",
+     "description": "Activer le contraste eleve",
+     "voice_input": "contraste eleve", "expected": ["contraste_eleve_toggle", "contraste_eleve"],
+     "expected_result": "Contraste eleve active"},
+    {"name": "access_sous_titres_live", "category": "accessibilite", "difficulty": "normal",
+     "description": "Activer les sous-titres en direct",
+     "voice_input": "sous titres en direct", "expected": ["sous_titres_live"],
+     "expected_result": "Live captions actives"},
+    {"name": "access_filtre_couleur", "category": "accessibilite", "difficulty": "normal",
+     "description": "Activer le filtre de couleur",
+     "voice_input": "filtre de couleur", "expected": ["filtre_couleur_toggle", "filtre_couleur"],
+     "expected_result": "Filtre couleur active"},
+    {"name": "access_gros_curseur", "category": "accessibilite", "difficulty": "easy",
+     "description": "Agrandir le curseur",
+     "voice_input": "agrandis le curseur", "expected": ["taille_curseur"],
+     "expected_result": "Curseur agrandi"},
+    {"name": "access_narrateur", "category": "accessibilite", "difficulty": "normal",
+     "description": "Activer le narrateur",
+     "voice_input": "active le narrateur", "expected": ["narrateur_toggle", "narrateur"],
+     "expected_result": "Narrateur active"},
+
+    # ── POWER MANAGEMENT ─────────────────────────────────────────────
+    {"name": "sys_power_plan", "category": "systeme", "difficulty": "normal",
+     "description": "Voir le plan d'alimentation",
+     "voice_input": "quel plan alimentation", "expected": ["plan_alimentation_actif"],
+     "expected_result": "Plan actif affiche"},
+    {"name": "sys_battery_report", "category": "systeme", "difficulty": "normal",
+     "description": "Rapport de batterie",
+     "voice_input": "rapport batterie", "expected": ["batterie_rapport"],
+     "expected_result": "Rapport genere"},
+    {"name": "sys_screen_timeout", "category": "systeme", "difficulty": "easy",
+     "description": "Configurer la veille ecran",
+     "voice_input": "timeout ecran", "expected": ["ecran_timeout"],
+     "expected_result": "Settings veille ouvert"},
+
+    # ── MULTI-ECRANS ─────────────────────────────────────────────────
+    {"name": "sys_detecter_ecrans", "category": "systeme", "difficulty": "normal",
+     "description": "Detecter les ecrans",
+     "voice_input": "detecte les ecrans", "expected": ["detecter_ecrans"],
+     "expected_result": "Ecrans detectes"},
+    {"name": "sys_param_affichage", "category": "systeme", "difficulty": "easy",
+     "description": "Parametres d'affichage",
+     "voice_input": "parametres affichage", "expected": ["param_affichage"],
+     "expected_result": "Settings display ouvert"},
+
+    # ── PROCESSUS AVANCE ─────────────────────────────────────────────
+    {"name": "sys_kill_process", "category": "systeme", "difficulty": "hard",
+     "description": "Tuer un processus par nom",
+     "voice_input": "tue le processus notepad", "expected": ["kill_process_nom", "kill_process"],
+     "expected_result": "Processus arrete"},
+    {"name": "sys_process_details", "category": "systeme", "difficulty": "normal",
+     "description": "Details d'un processus",
+     "voice_input": "details du processus chrome", "expected": ["processus_details"],
+     "expected_result": "Details affiches"},
+
+    # ── DIAGNOSTICS RESEAU ───────────────────────────────────────────
+    {"name": "sys_diag_reseau", "category": "systeme", "difficulty": "normal",
+     "description": "Diagnostic reseau complet",
+     "voice_input": "diagnostic reseau", "expected": ["diagnostic_reseau"],
+     "expected_result": "Diagnostic execute"},
+    {"name": "sys_wifi_password", "category": "systeme", "difficulty": "hard",
+     "description": "Voir le mot de passe WiFi",
+     "voice_input": "mot de passe wifi", "expected": ["wifi_mot_de_passe"],
+     "expected_result": "Password affiche"},
+
+    # ── OUTILS SYSTEME ───────────────────────────────────────────────
+    {"name": "sys_event_viewer", "category": "systeme", "difficulty": "normal",
+     "description": "Ouvrir l'observateur d'evenements",
+     "voice_input": "observateur evenements", "expected": ["ouvrir_evenements"],
+     "expected_result": "Event Viewer ouvert"},
+    {"name": "sys_services", "category": "systeme", "difficulty": "normal",
+     "description": "Ouvrir les services",
+     "voice_input": "ouvre les services", "expected": ["ouvrir_services"],
+     "expected_result": "Services ouvert"},
+    {"name": "sys_perfmon", "category": "systeme", "difficulty": "normal",
+     "description": "Moniteur de performances",
+     "voice_input": "moniteur de performance", "expected": ["ouvrir_moniteur_perf"],
+     "expected_result": "PerfMon ouvert"},
+    {"name": "sys_fiabilite", "category": "systeme", "difficulty": "normal",
+     "description": "Moniteur de fiabilite",
+     "voice_input": "moniteur de fiabilite", "expected": ["ouvrir_fiabilite"],
+     "expected_result": "Reliability Monitor ouvert"},
+
+    # ── RACCOURCIS WINDOWS ───────────────────────────────────────────
+    {"name": "sys_notification_center", "category": "systeme", "difficulty": "easy",
+     "description": "Ouvrir le centre de notifications",
+     "voice_input": "centre de notifications", "expected": ["action_center", "centre_notifications"],
+     "expected_result": "Win+N ouvert"},
+    {"name": "sys_quick_settings", "category": "systeme", "difficulty": "easy",
+     "description": "Ouvrir les parametres rapides",
+     "voice_input": "parametres rapides", "expected": ["quick_settings"],
+     "expected_result": "Win+A ouvert"},
+    {"name": "sys_search_windows", "category": "systeme", "difficulty": "easy",
+     "description": "Ouvrir la recherche Windows",
+     "voice_input": "recherche windows", "expected": ["search_windows", "recherche_windows"],
+     "expected_result": "Win+S ouvert"},
+
+    # ── CORRECTIONS VAGUE 16 ─────────────────────────────────────────
+    {"name": "correction_sandboxe", "category": "correction", "difficulty": "hard",
+     "description": "STT retourne 'sandboxe' au lieu de 'sandbox'",
+     "voice_input": "ouvre la sandboxe", "expected": ["sandbox_ouvrir", "ouvrir_sandbox"],
+     "expected_result": "Correction phonetique sandbox"},
+    {"name": "correction_imprimente", "category": "correction", "difficulty": "hard",
+     "description": "STT retourne 'imprimente' au lieu de 'imprimante'",
+     "voice_input": "liste les imprimentes", "expected": ["liste_imprimantes"],
+     "expected_result": "Correction phonetique imprimantes"},
 ]
 
 
