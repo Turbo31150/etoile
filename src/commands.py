@@ -1829,12 +1829,6 @@ COMMANDS: list[JarvisCommand] = [
         "ajoute une tache planifiee", "planifie une tache",
     ], "powershell", "Start-Process taskschd.msc -ArgumentList '/Create'"),
 
-    # ── Disque avance ────────────────────────────────────────────────────
-    JarvisCommand("espace_disque", "systeme", "Afficher l'espace disque utilise", [
-        "utilisation disque", "taille des disques", "espace libre disques",
-        "montre l'espace disque", "infos espace disques",
-    ], "powershell", "Get-PSDrive -PSProvider FileSystem | Select Name, @{N='Used(GB)';E={[math]::Round($_.Used/1GB,1)}}, @{N='Free(GB)';E={[math]::Round($_.Free/1GB,1)}}, @{N='Total(GB)';E={[math]::Round(($_.Used+$_.Free)/1GB,1)}} | Out-String"),
-
     # ── USB / Peripheriques ──────────────────────────────────────────────
     JarvisCommand("lister_usb", "systeme", "Lister les peripheriques USB connectes", [
         "liste les usb", "peripheriques usb", "usb connectes",
@@ -2603,6 +2597,29 @@ VOICE_CORRECTIONS: dict[str, str] = {
     "yutube": "youtube",
     "termenal": "terminal",
     "tairmenal": "terminal",
+    # Vague 19 — Corrections STT stress test
+    # Mutations phonetiques eau→o, o→eau
+    "yeauutube": "youtube",
+    "neauuveau": "nouveau",
+    "eaunglet": "onglet",
+    "geauugueule": "google",
+    # Mutations ch→sh
+    "sherche": "cherche",
+    "sharts": "charts",
+    # Lettres doublees/manquantes
+    "lisste": "liste",
+    "eteinss": "eteins",
+    "comprese": "compresse",
+    "compressse": "compresse",
+    "dosier": "dossier",
+    "dosiers": "dossiers",
+    # k→qu, qu→k
+    "publike": "publique",
+    "kree": "cree",
+    # Autres mutations STT courantes
+    "crée": "cree",
+    "nou vo": "nouveau",
+    "nouvo": "nouveau",
 }
 
 
@@ -2628,24 +2645,27 @@ def correct_voice_text(text: str) -> str:
 def similarity(a: str, b: str) -> float:
     """Calculate string similarity ratio (0.0 to 1.0).
 
-    Uses SequenceMatcher as primary, with a bag-of-words bonus
-    to handle word-order inversions from STT.
+    Uses max(SequenceMatcher, bag-of-words) to handle
+    word-order inversions from STT.
     """
     a_low, b_low = a.lower(), b.lower()
     seq_score = SequenceMatcher(None, a_low, b_low).ratio()
 
-    # Bag-of-words: compare word sets (order-insensitive)
+    # Bag-of-words: order-insensitive matching
     words_a = set(a_low.split())
     words_b = set(b_low.split())
     if words_a and words_b:
         intersection = words_a & words_b
         union = words_a | words_b
-        bow_score = len(intersection) / len(union) if union else 0.0
+        jaccard = len(intersection) / len(union)
+        # Coverage: fraction of trigger words present in input
+        coverage = len(intersection) / len(words_b)
+        bow_score = (jaccard + coverage) / 2.0
     else:
         bow_score = 0.0
 
-    # Weighted: 70% sequence, 30% bag-of-words
-    return seq_score * 0.70 + bow_score * 0.30
+    # Max of both — word inversions get rescued by bow_score
+    return max(seq_score, bow_score)
 
 
 def match_command(voice_text: str, threshold: float = 0.55) -> tuple[JarvisCommand | None, dict[str, str], float]:
